@@ -4,20 +4,38 @@
     "name": "Sajtos- Sonkás Szendvics",
     "description": "Prémium sonka, olvadt sajt és friss zöldségek kézműves buciban.",
     "image": "/images/szendvics-001.webp",
-    "category": "Classic"
+    "category": "Classic",
+    "layoutType": "hero-card"
   },
   {
     "id": "2",
     "name": "Húsvillás Különlegesség",
     "description": "Szaftos húsok, házi szószok és ropogós textúrák.",
     "image": "/images/sajtsonkahusvilla.webp",
-    "category": "Special"
+    "category": "Special",
+    "layoutType": "hero-card"
   },
   {
     "id": "3",
+    "name": "Itallap",
+    "description": "Frissítő italok és kávékülönlegességek a szendvicsek mellé.",
+    "image": "/images/Croissant_and_coffee.webp",
+    "category": "Drinks",
+    "layoutType": "price-list",
+    "prices": [
+      { "name": "Espresso", "price": "590 Ft", "description": "Sötét pörkölésű olasz kávé" },
+      { "name": "Cappuccino", "price": "890 Ft", "description": "Krémes tejhabbal" },
+      { "name": "Latte Macchiato", "price": "990 Ft" },
+      { "name": "Friss Narancslé", "price": "1290 Ft", "description": "0.3l frissen facsart" },
+      { "name": "Házi Limonádé", "price": "1190 Ft", "description": "0.5l idénygyümölcsökkel" }
+    ]
+  },
+  {
+    "id": "4",
     "name": "Kézműves Croissant",
     "description": "Vajas, omlós croissant reggeli mellé vagy napközben.",
     "image": "/images/Croissant_and_coffee.webp",
-    "category": "Breakfast"
+    "category": "Breakfast",
+    "layoutType": "hero-card"
   }
 ]
