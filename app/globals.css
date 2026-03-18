@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-bg: #e8e2d3;
+  --color-brand-brown: #775a2b;
+  --font-rokkitt: "Rokkitt", sans-serif;
+  
+  --breakpoint-xs: 480px;
+}
+
+:root {
+  --background: var(--color-brand-bg);
+  --foreground: #333333;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-rokkitt);
+  background-image: url('/images/grain.png');
+  background-repeat: repeat;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  position: fixed;
+}
+
+/* Utils */
+.frame-container {
+  position: fixed;
+  inset: 1.5rem 1.5rem 1.5rem 4.5rem;
+  pointer-events: none;
+  z-index: 50;
+}
+
+@media (max-width: 767px) {
+  .frame-container {
+    inset: 1.5rem 0.5rem 5rem 0.5rem;
+  }
+}
+
+.corner-base {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  background-image: url('/images/keret-sarok.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 767px) {
+  .corner-base {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.line-brown {
+  background-color: var(--color-brand-brown);
+  position: absolute;
+}
+
+.content-mask {
+  position: fixed;
+  inset: 1.5rem 1.5rem 1.5rem 1.5rem;
+  overflow: hidden;
+  z-index: 10;
+}
+
+@media (max-width: 767px) {
+  .content-mask {
+    inset: 1.5rem 0.5rem 5rem 0.5rem;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

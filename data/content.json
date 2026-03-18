@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1",
+    "name": "Sajtos- Sonkás Szendvics",
+    "description": "Prémium sonka, olvadt sajt és friss zöldségek kézműves buciban.",
+    "image": "/images/szendvics-001.webp",
+    "category": "Classic"
+  },
+  {
+    "id": "2",
+    "name": "Húsvillás Különlegesség",
+    "description": "Szaftos húsok, házi szószok és ropogós textúrák.",
+    "image": "/images/sajtsonkahusvilla.webp",
+    "category": "Special"
+  },
+  {
+    "id": "3",
+    "name": "Kézműves Croissant",
+    "description": "Vajas, omlós croissant reggeli mellé vagy napközben.",
+    "image": "/images/Croissant_and_coffee.webp",
+    "category": "Breakfast"
+  }
+]
