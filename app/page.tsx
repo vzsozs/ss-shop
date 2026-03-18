@@ -132,7 +132,7 @@ export default function Home() {
       <motion.div 
         initial={false}
         animate={{ opacity: isAnimating ? 0.8 : 0.2 }}
-        className="fixed bottom-10 left-1/2 -translate-x-1/2 w-64 h-1 bg-brand-brown/10 rounded-full z-[60] pointer-events-none"
+        className="fixed bottom-24 md:bottom-10 left-1/2 -translate-x-1/2 w-64 h-1 bg-brand-brown/10 rounded-full z-[60] pointer-events-none"
       >
         <motion.div 
           className="h-full bg-brand-brown origin-left rounded-full"
