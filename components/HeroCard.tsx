@@ -24,8 +24,8 @@ export default function HeroCard({ data }: { data: SlideData }) {
   };
 
   return (
-    <div className="flex justify-center items-stretch w-full max-w-[1500px] mx-auto px-4 md:px-16 py-8 md:py-16 h-full box-border max-md:pt-20">
-      <div className="grid grid-cols-2 gap-0 self-center w-full h-full p-4 md:p-12 overflow-hidden max-md:flex max-md:flex-col max-md:justify-center max-md:items-center max-md:gap-4 max-md:h-auto max-md:overflow-visible">
+    <div className="flex justify-center items-stretch w-full max-w-[1500px] mx-auto px-4 md:px-16 py-8 md:py-16 h-full box-border max-md:pt-48">
+      <div className="grid grid-cols-2 gap-0 self-center w-full h-full p-4 md:p-12 overflow-hidden max-md:flex max-md:flex-col max-md:justify-center max-md:items-center max-md:gap-4 max-md:h-auto max-md:overflow-visible relative">
         
         {/* Left Content - Category Area */}
         <motion.div 
@@ -47,7 +47,7 @@ export default function HeroCard({ data }: { data: SlideData }) {
             <div className="relative border border-yellow-500/30 p-1">
               <span className="absolute -top-3 left-0 text-[8px] bg-yellow-500 text-white px-1">pub:2</span>
               {categoryCta && (
-                <div className="flex flex-row items-center gap-6 mt-6 max-md:flex-col max-md:items-center flex-wrap">
+                <div className="flex flex-row items-center gap-3 mt-3 max-md:flex-col max-md:items-center max-md:gap-1 flex-wrap">
                   <span className="text-[#333333] font-normal uppercase tracking-widest text-[1rem] font-rokkitt">
                     {categoryCta.text}
                   </span>
@@ -66,7 +66,7 @@ export default function HeroCard({ data }: { data: SlideData }) {
           
           {/* Category Image as Background */}
           {categoryImage && (
-            <div className="absolute left-[-5%] bottom-[25%] -z-10 w-[30vw] max-w-[500px] opacity-30 max-md:fixed max-md:left-1/2 max-md:-translate-x-1/2 max-md:top-1/4 max-md:w-[60vw] border-2 border-dashed border-blue-400/50">
+            <div className="absolute left-[-5%] bottom-[25%] -z-10 w-[30vw] max-w-[500px] opacity-30 max-md:hidden border-2 border-dashed border-blue-400/50">
               <span className="absolute top-0 left-1/2 -translate-x-1/2 bg-blue-400 text-white text-[10px] px-2 shadow-lg">pub:1 (BG)</span>
               <Image
                 src={categoryImage}
@@ -104,7 +104,7 @@ export default function HeroCard({ data }: { data: SlideData }) {
           )}
           
           {/* Product Description */}
-          <div className="z-[2] text-right mt-12 mb-8 relative max-md:text-center max-md:w-[90vw] max-md:mx-auto max-md:mt-4 max-md:mb-16 max-md:px-6 border border-orange-500/30 p-2">
+          <div className="z-[2] text-right mt-12 mb-8 relative max-md:text-center max-md:w-full max-md:mx-auto max-md:mt-4 max-md:mb-16 max-md:px-4 border border-orange-500/30 p-2">
             {/* pub:5 = admin/termekek 6 (Product Name) */}
             <span className="absolute -top-3 right-0 text-[8px] bg-orange-500 text-white px-1">pub:5</span>
             <h2 className="text-[32px] font-bold leading-[36px] mb-2.5 max-md:text-[24px]">
