@@ -16,21 +16,27 @@ export const Categories: CollectionConfig = {
   fields: [
     {
       name: 'name',
-      label: 'Kategória neve',
+      label: 'Kategória neve (admin/kategoriak 0)',
       type: 'text',
       required: true,
       unique: true,
     },
     {
+      name: 'description',
+      label: 'Rövid leírás (admin/kategoriak 2)',
+      type: 'text',
+      required: true,
+    },
+    {
       name: 'image',
-      label: 'Kategória képe',
+      label: 'Kategória képe (admin/kategoriak 1)',
       type: 'upload',
       relationTo: 'media',
       required: true,
     },
     {
       name: 'ctaType',
-      label: 'CTA Gomb Típusa',
+      label: 'CTA Gomb Típusa (admin/kategoriak 3)',
       type: 'select',
       defaultValue: 'none',
       options: [

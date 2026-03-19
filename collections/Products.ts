@@ -31,8 +31,17 @@ export const Products: CollectionConfig = {
       },
     },
     {
+      name: 'showInSlider',
+      label: 'Megjelenítés a főoldali sliderben',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
       name: 'name',
-      label: 'Terméknév',
+      label: 'Terméknév (admin/termekek 6)',
       type: 'text',
       required: true,
     },
@@ -56,7 +65,7 @@ export const Products: CollectionConfig = {
     },
     {
       name: 'description',
-      label: 'Leírás',
+      label: 'Leírás (admin/termekek 5)',
       type: 'richText',
       editor: lexicalEditor({
         features: () => [
@@ -70,7 +79,7 @@ export const Products: CollectionConfig = {
     },
     {
       name: 'price',
-      label: 'Ár (Ft)',
+      label: 'Ár (Ft) (admin/termekek 12)',
       type: 'number',
       required: true,
       validate: (value: unknown) => {
@@ -82,14 +91,14 @@ export const Products: CollectionConfig = {
     },
     {
       name: 'category',
-      label: 'Kategória',
+      label: 'Kategória (admin/termekek 13)',
       type: 'relationship',
       relationTo: 'categories',
       required: true,
     },
     {
       name: 'unit',
-      label: 'Kiszerelés',
+      label: 'Kiszerelés (admin/termekek 14)',
       type: 'select',
       required: true,
       defaultValue: 'db',
@@ -101,7 +110,7 @@ export const Products: CollectionConfig = {
     },
     {
       name: 'features',
-      label: 'Tulajdonságok',
+      label: 'Tulajdonságok (admin/termekek 15)',
       type: 'array',
       fields: [
         {
@@ -118,7 +127,7 @@ export const Products: CollectionConfig = {
     },
     {
       name: 'image',
-      label: 'Kép',
+      label: 'Termékkép (admin/termekek 4)',
       type: 'upload',
       relationTo: 'media',
       required: true,

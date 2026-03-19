@@ -4,80 +4,62 @@ import { revalidatePath } from 'next/cache'
 export const Slides: CollectionConfig = {
   slug: 'slides',
   labels: {
-    singular: 'Dia',
-    plural: 'Diák',
+    singular: 'Étlap',
+    plural: 'Étlapok',
   },
   admin: {
     useAsTitle: 'name',
+    defaultColumns: ['name', 'category'],
   },
   fields: [
     {
       name: 'name',
-      label: 'Név',
+      label: 'Étlap neve (admin/etlapok 7)',
       type: 'text',
       required: true,
     },
     {
       name: 'description',
-      label: 'Leírás',
+      label: 'Alcím / Leírás (admin/etlapok 8)',
       type: 'textarea',
       required: true,
     },
     {
       name: 'image',
-      label: 'Kép',
+      label: 'Háttérkép',
       type: 'upload',
       relationTo: 'media',
       required: true,
     },
     {
       name: 'category',
-      label: 'Kategória',
+      label: 'Kategória megnevezés',
       type: 'text',
       required: true,
     },
     {
-      name: 'layoutType',
-      label: 'Elrendezés típusa',
-      type: 'select',
-      required: true,
-      options: [
-        {
-          label: 'Hero kártya',
-          value: 'hero-card',
-        },
-        {
-          label: 'Árlista',
-          value: 'price-list',
-        },
-      ],
-    },
-    {
       name: 'prices',
-      label: 'Árak',
+      label: 'Árak / Tételek',
       type: 'array',
       fields: [
         {
           name: 'name',
-          label: 'Név',
+          label: 'Tétel neve (admin/etlapok 9)',
           type: 'text',
           required: true,
         },
         {
           name: 'price',
-          label: 'Ár',
+          label: 'Ár (admin/etlapok 10)',
           type: 'text',
           required: true,
         },
         {
           name: 'description',
-          label: 'Leírás',
+          label: 'Részletek (admin/etlapok 11)',
           type: 'textarea',
         },
       ],
-      admin: {
-        condition: (data) => data?.layoutType === 'price-list',
-      },
     },
   ],
   hooks: {

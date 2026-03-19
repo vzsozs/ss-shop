@@ -11,7 +11,7 @@ interface CategoryCardProps {
 }
 
 export default function CategoryCard({ category }: CategoryCardProps) {
-  const { name, image, ctaType } = category;
+  const { name, description, image, ctaType } = category;
 
   const getCtaConfig = () => {
     switch (ctaType) {
@@ -60,9 +60,12 @@ export default function CategoryCard({ category }: CategoryCardProps) {
 
       {/* Content */}
       <div className="absolute inset-0 p-8 flex flex-col justify-end">
-        <h3 className="text-3xl font-black text-white mb-4 transform transition-transform duration-500 group-hover:-translate-y-2">
+        <h3 className="text-3xl font-black text-white mb-2 transform transition-transform duration-500 group-hover:-translate-y-2">
           {name}
         </h3>
+        <p className="text-white/70 text-sm mb-6 line-clamp-2 transform transition-all duration-500 group-hover:-translate-y-2 delay-75">
+          {description}
+        </p>
         
         {cta && (
           <Link

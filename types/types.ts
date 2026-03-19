@@ -12,13 +12,21 @@ export interface SlideData {
   description: string;
   image: string;
   category: string | Category;
-  layoutType: LayoutType;
+  layoutType: 'hero-card' | 'price-list';
+  link?: string;
+  // New fields for Product-based slides
+  productImage?: string;
+  productDescription?: string | Record<string, unknown>;
+  categoryImage?: string;
+  categoryDescription?: string;
+  categoryCta?: { label: string; href: string; iconType: string; text?: string };
   prices?: PriceItem[];
 }
 
 export interface Category {
   id: string;
   name: string;
+  description: string;
   image: string;
   ctaType: 'none' | 'order' | 'drink' | 'contact';
 }
@@ -32,6 +40,7 @@ export interface Product {
   category: string | Category;
   unit: string;
   archived: boolean;
+  showInSlider: boolean;
   features?: {
     tulajdonság_neve: string;
     érték: string;

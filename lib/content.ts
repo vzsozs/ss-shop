@@ -6,9 +6,16 @@ import content from "@/data/content.json";
 const mapImageUrl = (image: unknown): string => {
   if (typeof image === 'object' && image !== null) {
     const url = String((image as Record<string, unknown>).url || '');
-    return url.replace('/api/media/file/', '/media/');
+    if (url.startsWith('/') || url.startsWith('http')) {
+      return url.replace('/api/media/file/', '/media/');
+    }
   }
-  return String(image || '').replace('/api/media/file/', '/media/');
+  const str = String(image || '');
+  if (str.startsWith('/') || str.startsWith('http')) {
+    return str.replace('/api/media/file/', '/media/');
+  }
+  // Fallback for IDs or missing images
+  return '/media/placeholder.png'; 
 };
 
 const mapCategory = (cat: unknown): string | Category => {
@@ -17,6 +24,7 @@ const mapCategory = (cat: unknown): string | Category => {
     return {
       id: String(c.id),
       name: String(c.name),
+      description: String(c.description),
       image: mapImageUrl(c.image),
       ctaType: (c.ctaType as Category['ctaType']) || 'none',
     };
@@ -25,40 +33,95 @@ const mapCategory = (cat: unknown): string | Category => {
 };
 
 export async function getSlidesData(): Promise<SlideData[]> {
-  console.log("Fetching data...");
-  
   try {
     const payload = await getPayload({ config })
     
-    // Fetch slides from Payload
-    const { docs } = await payload.find({
-      collection: 'slides',
-      depth: 1, // Ensure we get the full media object
+    // 1. Fetch products marked for slider
+    const { docs: productDocs } = await payload.find({
+      collection: 'products',
+      where: {
+        and: [
+          { archived: { not_equals: true } },
+          { showInSlider: { equals: true } }
+        ]
+      },
+      depth: 2,
     })
 
-    if (docs && docs.length > 0) {
-      console.log("Adatforrás: Payload CMS");
+    // 2. Fetch "Étlapok" (from slides collection)
+    const { docs: menuDocs } = await payload.find({
+      collection: 'slides',
+      depth: 2,
+    })
+
+    const productSlides = (productDocs as Record<string, unknown>[]).map((doc) => {
+      const cat = doc.category as Record<string, unknown> | null;
       
-      // Map Payload docs to SlideData structure
-      return (docs as Record<string, unknown>[]).map((doc) => ({
-        id: String(doc.id),
+      // Helper for CTA
+      const getCta = (c: Record<string, unknown> | null) => {
+        if (!c) return undefined;
+        const type = String(c.ctaType);
+        if (type === 'none') return undefined;
+        
+        let label = 'Megnézem';
+        let href = '/';
+        let text = 'Nézd meg kínálatunkat:';
+        
+        if (type === 'order') { 
+          text = 'Kapd el a nap ízét';
+          label = 'Szendvicseink'; 
+          href = '/#rendeles'; 
+        }
+        if (type === 'drink') { 
+          text = 'Szomjas vagy?';
+          label = 'Itallap'; 
+          href = '/itallap'; 
+        }
+        if (type === 'contact') { 
+          text = 'Kérdésed van valamilyen rendezvény kapcsán?';
+          label = 'Kapcsolat'; 
+          href = '/kapcsolat'; 
+        }
+        
+        return { label, href, iconType: type, text };
+      };
+
+      return {
+        id: `prod-${doc.id}`,
         name: String(doc.name),
-        description: String(doc.description),
-        image: mapImageUrl(doc.image),
+        description: "", // HeroCard will use productDescription instead
+        image: mapImageUrl(doc.image), // Main image (fallback)
         category: mapCategory(doc.category),
-        layoutType: doc.layoutType as SlideData["layoutType"],
-        prices: Array.isArray(doc.prices) ? doc.prices.map((p: Record<string, unknown>) => ({
-          name: String(p.name),
-          price: String(p.price),
-          description: p.description ? String(p.description) : undefined
-        })) : undefined
-      }));
-    }
+        layoutType: 'hero-card' as const,
+        link: `/termek/${doc.slug}`, // Keep for backward compatibility or future use
+        
+        // New split fields
+        productImage: mapImageUrl(doc.image),
+        productDescription: doc.description as Record<string, unknown>,
+        categoryImage: cat ? mapImageUrl(cat.image) : undefined,
+        categoryDescription: cat ? String(cat.description) : undefined,
+        categoryCta: getCta(cat),
+      };
+    });
+
+    const menuSlides = (menuDocs as Record<string, unknown>[]).map((doc) => ({
+      id: `menu-${doc.id}`,
+      name: String(doc.name),
+      description: String(doc.description),
+      image: mapImageUrl(doc.image),
+      category: String(doc.category),
+      layoutType: 'price-list' as const,
+      prices: Array.isArray(doc.prices) ? doc.prices.map((p: Record<string, unknown>) => ({
+        name: String(p.name),
+        price: String(p.price),
+        description: p.description ? String(p.description) : undefined
+      })) : undefined
+    }));
+
+    return [...productSlides, ...menuSlides];
     
-    console.log("Adatforrás: JSON fallback");
-    return content as SlideData[];
-  } catch {
-    console.log("Adatforrás: JSON fallback (Payload nem érhető el)");
+  } catch (error) {
+    console.log("Hiba a diák lekérésekor, fallback a JSON-ra:", error);
     return content as SlideData[];
   }
 }
@@ -85,6 +148,7 @@ export async function getProducts(): Promise<Product[]> {
       category: mapCategory(doc.category),
       unit: String(doc.unit),
       archived: Boolean(doc.archived),
+      showInSlider: Boolean(doc.showInSlider),
       features: Array.isArray(doc.features) ? (doc.features as Record<string, unknown>[]).map((f) => ({
         tulajdonság_neve: String(f.tulajdonság_neve),
         érték: String(f.érték)
@@ -123,6 +187,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       category: mapCategory(doc.category),
       unit: String(doc.unit),
       archived: Boolean(doc.archived),
+      showInSlider: Boolean(doc.showInSlider),
       features: Array.isArray(doc.features) ? (doc.features as Record<string, unknown>[]).map((f) => ({
         tulajdonság_neve: String(f.tulajdonság_neve),
         érték: String(f.érték)
@@ -146,6 +211,7 @@ export async function getCategories(): Promise<Category[]> {
     return (docs as Record<string, unknown>[]).map((doc) => ({
       id: String(doc.id),
       name: String(doc.name),
+      description: String(doc.description),
       image: mapImageUrl(doc.image),
       ctaType: (doc.ctaType as Category['ctaType']) || 'none',
     }));
