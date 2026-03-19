@@ -1,7 +1,6 @@
-/* THIS FILE WAS GENERATED AUTOMATICALLY BY PAYLOAD. */
-/* DO NOT MODIFY IT BY HAND. */
 import { NotFoundPage } from '@payloadcms/next/views'
 import config from '../../../../payload.config'
+import { importMap } from '../importMap'
 
 type Args = {
   params: Promise<{
@@ -12,6 +11,7 @@ type Args = {
   }>
 }
 
-const NotFound = ({ params, searchParams }: Args) => NotFoundPage({ config, params, searchParams })
+const NotFound = ({ params, searchParams }: Args) => 
+  NotFoundPage({ config, importMap, params, searchParams })
 
 export default NotFound

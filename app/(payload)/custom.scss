@@ -1,1 +1,105 @@
-/* Add your custom styles here */
+/* Inlined Brand Styles to avoid import issues */
+$brand-bg: #e8e2d3;
+$brand-brown: #775a2b;
+$brand-text: #333333;
+
+.grain-bg {
+  background-image: url('/images/grain.png');
+  background-repeat: repeat;
+}
+
+/* Apply brand styles to Payload Admin */
+html, body {
+  background-color: #e8e2d3;
+  color: #775a2b !important;
+  font-family: var(--font-rokkitt) !important;
+  font-size: 1.1rem !important;
+  @extend .grain-bg;
+}
+
+/* Override Payload CSS variables */
+:root {
+  --theme-bg: #e8e2d3;
+  --theme-elevation-0: #e8e2d3;
+  --theme-elevation-50: #e3ddcd;
+  --theme-elevation-100: #ded7c7;
+  --theme-elevation-150: #d9d2c1;
+  --theme-elevation-200: #d4ccbb;
+  
+  --brand-bg: #e8e2d3;
+  --brand-brown: #775a2b;
+  --brand-text: #775a2b;
+
+  --theme-primary-50: #f1efea;
+  --theme-primary-100: #e3dfd5;
+  --theme-primary-200: #c7bfc1;
+  --theme-primary-300: #abab8d;
+  --theme-primary-400: #8f8759;
+  --theme-primary-500: #775a2b;
+  --theme-primary-600: #6b5127;
+  --theme-primary-700: #5f4823;
+
+  --theme-success-500: #2b775a;
+  --theme-warning-500: #775a2b;
+  --theme-error-500: #772b2b;
+
+  --theme-text: #775a2b;
+  --theme-elevation-800: #775a2b; /* Darker bits */
+}
+
+/* Adjust layout to avoid logo overlap */
+.template-default__content,
+.template-login__main {
+  padding-top: 5rem !important;
+}
+
+/* Labels and text elements */
+.field-label, 
+.label,
+.nav__header,
+.doc-header__title,
+.list-controls__title,
+.nav__link,
+.pill,
+.btn--style-secondary,
+.form-submit {
+  color: #775a2b !important;
+}
+
+/* Admin Sidebar customization */
+.nav {
+  background-color: transparent !important;
+  border-right: 1px solid rgba(119, 90, 43, 0.17) !important;
+  
+  .nav__link:hover {
+     background-color: rgba(119, 90, 43, 0.05) !important;
+  }
+}
+
+/* Button customization */
+.btn--style-primary {
+  background-color: #775a2b !important;
+  border-color: #775a2b !important;
+  color: #e8e2d3 !important;
+  font-family: var(--font-rokkitt) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.btn--style-secondary {
+  border-color: #775a2b !important;
+  color: #775a2b !important;
+  font-family: var(--font-rokkitt) !important;
+}
+
+/* Card and List items */
+.card, .list-selection__list-item {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(119, 90, 43, 0.1) !important;
+}
+
+/* Table and List view fixes */
+.table th, .table td {
+  color: #775a2b !important;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Logo from "@/components/Brand/Logo";
 
 interface SidebarProps {
   onMenuClick: () => void;
@@ -27,13 +27,7 @@ export default function Sidebar({ onMenuClick }: SidebarProps) {
           <div className="text-brand-brown/60 whitespace-nowrap text-[0.8rem] font-black leading-none -rotate-90 max-md:rotate-0 max-md:order-last">
             EST. 2023
           </div>
-          <Image
-            src="/images/SzivunkLelkunk-logo.svg"
-            alt="SzivünkLelkünk"
-            width={32}
-            height={32}
-            className="w-8 h-auto max-md:order-first"
-          />
+          <Logo className="w-8 h-auto max-md:order-first" />
         </div>
       </div>
     </div>

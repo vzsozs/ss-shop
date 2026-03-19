@@ -4,6 +4,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import sharp from 'sharp'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { hu } from '@payloadcms/translations/languages/hu'
 
 import { Slides } from './collections/Slides'
 import { Media } from './collections/Media'
@@ -14,6 +15,12 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: 'users',
+    components: {
+      graphics: {
+        Logo: '/components/Brand/Logo#Logo',
+        Icon: '/components/Brand/Icon#Icon',
+      },
+    },
   },
   collections: [
     Slides,
@@ -34,5 +41,8 @@ export default buildConfig({
   sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
+  },
+  i18n: {
+    supportedLanguages: { hu },
   },
 })

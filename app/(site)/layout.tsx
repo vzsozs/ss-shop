@@ -1,7 +1,7 @@
 "use client";
 
 import { Rokkitt } from "next/font/google";
-import "./globals.css";
+import "../globals.css"; /* Path adjusted */
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import Preloader from "@/components/Preloader";
@@ -13,7 +13,7 @@ const rokkitt = Rokkitt({
   variable: "--font-rokkitt",
 });
 
-export default function RootLayout({
+export default function SiteLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

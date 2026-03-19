@@ -2,6 +2,10 @@ import { CollectionConfig } from 'payload'
 
 export const Media: CollectionConfig = {
   slug: 'media',
+  labels: {
+    singular: 'Média',
+    plural: 'Média',
+  },
   upload: {
     staticDir: 'media',
     imageSizes: [
@@ -20,7 +24,7 @@ export const Media: CollectionConfig = {
       {
         name: 'tablet',
         width: 1024,
-        height: null,
+        height: undefined,
       },
     ],
     adminThumbnail: 'thumbnail',
@@ -29,6 +33,7 @@ export const Media: CollectionConfig = {
   fields: [
     {
       name: 'alt',
+      label: 'Helyettesítő szöveg',
       type: 'text',
     },
   ],

@@ -1,6 +1,10 @@
 'use server'
-import { handleServerFunctions as payloadHandleServerFunctions } from '@payloadcms/next/layouts'
+import { handleServerFunctions as h } from '@payloadcms/next/layouts'
+import config from '../../payload.config'
 
-export const handleServerFunctions = async (args: any) => {
-  return payloadHandleServerFunctions(args)
+export async function serverFunction(args: any) {
+  return h({
+    ...args,
+    config,
+  })
 }
