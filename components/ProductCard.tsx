@@ -37,7 +37,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="object-contain p-6 transition-transform duration-500 group-hover:scale-110"
           />
           <div className="absolute top-4 left-4 bg-brand-brown text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-            {category}
+            {typeof category === 'object' ? category.name : category}
           </div>
         </div>
 

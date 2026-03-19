@@ -9,6 +9,7 @@ import { hu } from '@payloadcms/translations/languages/hu'
 import { Slides } from './collections/Slides'
 import { Media } from './collections/Media'
 import { Products } from './collections/Products'
+import { Categories } from './collections/Categories'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -25,6 +26,7 @@ export default buildConfig({
   },
   collections: [
     Products,
+    Categories,
     Slides,
     Media,
     {

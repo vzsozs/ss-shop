@@ -1,4 +1,4 @@
-import { SlideData, Product } from "@/types/types";
+import { SlideData, Product, Category } from "@/types/types";
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import content from "@/data/content.json";
@@ -9,6 +9,19 @@ const mapImageUrl = (image: unknown): string => {
     return url.replace('/api/media/file/', '/media/');
   }
   return String(image || '').replace('/api/media/file/', '/media/');
+};
+
+const mapCategory = (cat: unknown): string | Category => {
+  if (typeof cat === 'object' && cat !== null && 'id' in cat) {
+    const c = cat as Record<string, unknown>;
+    return {
+      id: String(c.id),
+      name: String(c.name),
+      image: mapImageUrl(c.image),
+      ctaType: (c.ctaType as Category['ctaType']) || 'none',
+    };
+  }
+  return String(cat || '');
 };
 
 export async function getSlidesData(): Promise<SlideData[]> {
@@ -32,7 +45,7 @@ export async function getSlidesData(): Promise<SlideData[]> {
         name: String(doc.name),
         description: String(doc.description),
         image: mapImageUrl(doc.image),
-        category: String(doc.category),
+        category: mapCategory(doc.category),
         layoutType: doc.layoutType as SlideData["layoutType"],
         prices: Array.isArray(doc.prices) ? doc.prices.map((p: Record<string, unknown>) => ({
           name: String(p.name),
@@ -55,6 +68,11 @@ export async function getProducts(): Promise<Product[]> {
     const payload = await getPayload({ config })
     const { docs } = await payload.find({
       collection: 'products',
+      where: {
+        archived: {
+          not_equals: true,
+        },
+      },
       depth: 1,
     })
 
@@ -64,8 +82,9 @@ export async function getProducts(): Promise<Product[]> {
       slug: String(doc.slug),
       description: doc.description as Record<string, unknown>,
       price: Number(doc.price),
-      category: String(doc.category),
+      category: mapCategory(doc.category),
       unit: String(doc.unit),
+      archived: Boolean(doc.archived),
       features: Array.isArray(doc.features) ? (doc.features as Record<string, unknown>[]).map((f) => ({
         tulajdonság_neve: String(f.tulajdonság_neve),
         érték: String(f.érték)
@@ -101,8 +120,9 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       slug: String(doc.slug),
       description: doc.description as Record<string, unknown>,
       price: Number(doc.price),
-      category: String(doc.category),
+      category: mapCategory(doc.category),
       unit: String(doc.unit),
+      archived: Boolean(doc.archived),
       features: Array.isArray(doc.features) ? (doc.features as Record<string, unknown>[]).map((f) => ({
         tulajdonság_neve: String(f.tulajdonság_neve),
         érték: String(f.érték)
@@ -114,4 +134,25 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     return null;
   }
 }
+
+export async function getCategories(): Promise<Category[]> {
+  try {
+    const payload = await getPayload({ config })
+    const { docs } = await payload.find({
+      collection: 'categories',
+      depth: 1,
+    })
+
+    return (docs as Record<string, unknown>[]).map((doc) => ({
+      id: String(doc.id),
+      name: String(doc.name),
+      image: mapImageUrl(doc.image),
+      ctaType: (doc.ctaType as Category['ctaType']) || 'none',
+    }));
+  } catch (error) {
+    console.log("Hiba a kategóriák lekérésekor:", error);
+    return [];
+  }
+}
+
 

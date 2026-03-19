@@ -41,7 +41,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <div className="flex flex-col">
             <div className="mb-8">
               <span className="text-xs font-bold uppercase tracking-[0.2em] opacity-40 mb-2 block">
-                {category}
+                {typeof category === 'object' ? category.name : category}
               </span>
               <h1 className="text-5xl md:text-7xl font-black leading-tight mb-4">
                 {name}

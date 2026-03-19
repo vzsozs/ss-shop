@@ -11,9 +11,16 @@ export interface SlideData {
   name: string;
   description: string;
   image: string;
-  category: string;
+  category: string | Category;
   layoutType: LayoutType;
   prices?: PriceItem[];
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  image: string;
+  ctaType: 'none' | 'order' | 'drink' | 'contact';
 }
 
 export interface Product {
@@ -22,8 +29,9 @@ export interface Product {
   slug: string;
   description: Record<string, unknown>; // Lexical JSON
   price: number;
-  category: string;
+  category: string | Category;
   unit: string;
+  archived: boolean;
   features?: {
     tulajdonság_neve: string;
     érték: string;

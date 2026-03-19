@@ -15,12 +15,21 @@ export const Products: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'price', 'category', 'slug'],
+    defaultColumns: ['name', 'price', 'category', 'archived', 'slug'],
   },
   access: {
     read: () => true,
   },
   fields: [
+    {
+      name: 'archived',
+      label: 'Archivált (nem választható)',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+      },
+    },
     {
       name: 'name',
       label: 'Terméknév',
@@ -74,14 +83,9 @@ export const Products: CollectionConfig = {
     {
       name: 'category',
       label: 'Kategória',
-      type: 'select',
+      type: 'relationship',
+      relationTo: 'categories',
       required: true,
-      options: [
-        { label: 'Szendvics', value: 'szendvics' },
-        { label: 'Kávé', value: 'kave' },
-        { label: 'Üdítő', value: 'udito' },
-        { label: 'Egyéb', value: 'egyeb' },
-      ],
     },
     {
       name: 'unit',
