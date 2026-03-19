@@ -8,6 +8,7 @@ import { hu } from '@payloadcms/translations/languages/hu'
 
 import { Slides } from './collections/Slides'
 import { Media } from './collections/Media'
+import { Products } from './collections/Products'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -23,6 +24,7 @@ export default buildConfig({
     },
   },
   collections: [
+    Products,
     Slides,
     Media,
     {
@@ -40,7 +42,7 @@ export default buildConfig({
   }),
   sharp,
   typescript: {
-    outputFile: path.resolve(dirname, 'payload-types.ts'),
+    outputFile: path.resolve(dirname, 'types/payload-types.ts'),
   },
   i18n: {
     supportedLanguages: { hu },

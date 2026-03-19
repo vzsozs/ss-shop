@@ -16,6 +16,22 @@ export interface SlideData {
   prices?: PriceItem[];
 }
 
+export interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description: Record<string, unknown>; // Lexical JSON
+  price: number;
+  category: string;
+  unit: string;
+  features?: {
+    tulajdonság_neve: string;
+    érték: string;
+  }[];
+  image: string;
+}
+
 export interface APIResponse {
   slides: SlideData[];
 }
+

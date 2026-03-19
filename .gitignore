@@ -3,7 +3,7 @@
 # dependencies
 /node_modules
 /design_temp
-payload.db
+/payload.db
 /.pnp
 .pnp.*
 .yarn/*

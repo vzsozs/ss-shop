@@ -6,8 +6,11 @@ export const Media: CollectionConfig = {
     singular: 'Média',
     plural: 'Média',
   },
+  access: {
+    read: () => true,
+  },
   upload: {
-    staticDir: 'media',
+    staticDir: 'public/media',
     imageSizes: [
       {
         name: 'thumbnail',

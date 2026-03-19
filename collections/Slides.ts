@@ -1,4 +1,5 @@
 import { CollectionConfig } from 'payload'
+import { revalidatePath } from 'next/cache'
 
 export const Slides: CollectionConfig = {
   slug: 'slides',
@@ -79,4 +80,18 @@ export const Slides: CollectionConfig = {
       },
     },
   ],
+  hooks: {
+    afterChange: [
+      () => {
+        revalidatePath('/')
+        console.log('Adatfrissítés: ISR revalidálás elindítva a főoldalon (/)')
+      },
+    ],
+    afterDelete: [
+      () => {
+        revalidatePath('/')
+        console.log('Adattörlés: ISR revalidálás elindítva a főoldalon (/)')
+      },
+    ],
+  },
 }

@@ -7,8 +7,7 @@ export default async function Home() {
   try {
     slides = await getSlidesData();
     console.log(`Successfully fetched ${slides.length} slides.`);
-  } catch (error) {
-    console.error("Failed to fetch slides in Home page:", error);
+  } catch {
     // Fallback happens in getSlidesData already, but we ensure list is array here
     slides = [];
   }
