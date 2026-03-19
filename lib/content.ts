@@ -1,29 +1,43 @@
-import { APIResponse, SlideData } from "@/types/types";
+import { SlideData } from "@/types/types";
+import { getPayload } from 'payload'
+import config from '@/payload.config'
+import content from "@/data/content.json";
 
 export async function getSlidesData(): Promise<SlideData[]> {
+  console.log("Fetching data...");
+  
   try {
-    // In a real server environment, we would need the full URL.
-    // For local dev and this specific exercise, we call the API.
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/content`, {
-      cache: "no-store", // Ensure fresh data for now
-    });
-
-    if (!res.ok) {
-      console.error(`API returned error: ${res.status} ${res.statusText}`);
-      return [];
-    }
-
-    const data: APIResponse = await res.json();
+    const payload = await getPayload({ config })
     
-    if (!data || !Array.isArray(data.slides)) {
-      console.error("Invalid API response format:", data);
-      return [];
-    }
+    // Fetch slides from Payload
+    const { docs } = await payload.find({
+      collection: 'slides',
+      depth: 1, // Ensure we get the full media object
+    })
 
-    return data.slides;
+    if (docs && docs.length > 0) {
+      console.log("Data fetched from Payload CMS");
+      
+      // Map Payload docs to SlideData structure
+      return (docs as any[]).map((doc) => ({
+        id: doc.id,
+        name: doc.name,
+        description: doc.description,
+        image: typeof doc.image === 'object' ? doc.image.url : doc.image,
+        category: doc.category,
+        layoutType: doc.layoutType,
+        prices: doc.prices?.map((p: any) => ({
+          name: p.name,
+          price: p.price,
+          description: p.description
+        }))
+      })) as SlideData[];
+    }
+    
+    console.log("Payload collection empty, falling back to JSON");
+    return content as SlideData[];
   } catch (error) {
-    console.error("Critical error in getSlidesData:", error);
-    return [];
+    console.error("Payload not available or error occurred, falling back to JSON:", error);
+    return content as SlideData[];
   }
 }
