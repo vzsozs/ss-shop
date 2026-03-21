@@ -76,7 +76,7 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
           description: '',
           price: 0,
           category: '',
-          unit: 'pc',
+          unit: 'db',
           features: [],
           image: null,
           showInSlider: false,
@@ -110,26 +110,32 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
 
   // Initialize editor content when product data is loaded
   useEffect(() => {
-    if (product?.description && editorRef.current && editorRef.current.innerHTML === '') {
-      const lexicalToText = (json: Record<string, unknown>) => {
+    if (product?.description && editorRef.current && (editorRef.current.innerHTML === '' || editorRef.current.innerHTML === '<p><br></p>')) {
+      const lexicalToHtml = (json: Record<string, unknown>) => {
         if (!json || !json.root) return ''
         const root = json.root as { children?: unknown[] }
         if (!root.children) return ''
         
         return root.children.map((child) => {
-          const c = child as { type?: string, children?: { text?: string }[] }
+          const c = child as { type?: string, children?: { text?: string, format?: number }[], tag?: string }
           if (c.type === 'paragraph') {
-            return c.children?.map((t) => t.text || '').join('') || ''
+            const textContent = c.children?.map((t) => {
+              let text = t.text || ''
+              if (t.format === 1) text = `<b>${text}</b>`
+              if (t.format === 2) text = `<i>${text}</i>`
+              return text
+            }).join('') || ''
+            return `<p>${textContent}</p>`
           }
           return ''
-        }).join('\n')
+        }).join('')
       }
       
       const content = typeof product.description === 'object' 
-        ? lexicalToText(product.description) 
+        ? lexicalToHtml(product.description as Record<string, unknown>) 
         : product.description
       
-      editorRef.current.innerText = content
+      editorRef.current.innerHTML = content
     }
   }, [product])
 
@@ -144,16 +150,57 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
       if (isNew) delete (submitData as { id?: string }).id
 
       // Extract IDs for relationships
-      if (typeof submitData.category === 'object' && submitData.category !== null) {
-        submitData.category = (submitData.category as { id: string }).id
+      const getID = (val: unknown): string | number | null => {
+        if (val === undefined || val === null || val === '') return null
+        
+        let id: string | number | null = null
+        if (typeof val === 'string' || typeof val === 'number') {
+          id = val
+        } else if (typeof val === 'object') {
+          const v = val as { id?: string | number, _id?: string | number }
+          id = v.id || v._id || null
+        }
+
+        if (id !== null && typeof id === 'string') {
+          const num = Number(id)
+          return isNaN(num) || id === '' ? id : num
+        }
+        return id
       }
-      if (typeof submitData.image === 'object' && submitData.image !== null) {
-        submitData.image = (submitData.image as { id: string }).id
-      }
+
+      submitData.category = getID(product.category)
+      submitData.image = getID(product.image)
 
       // Handle RichText (Description)
       if (editorRef.current) {
-        const text = editorRef.current.innerText;
+        const parseHTMLToLexical = (element: HTMLElement) => {
+          const nodes: { type: string, text: string, format: number, version: 1 }[] = []
+          const traverse = (node: Node, currentFormat = 0) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+              if (node.textContent) {
+                nodes.push({
+                  type: 'text',
+                  text: node.textContent,
+                  format: currentFormat,
+                  version: 1
+                })
+              }
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+              const el = node as HTMLElement
+              let newFormat = currentFormat
+              const tag = el.tagName.toLowerCase()
+              if (tag === 'b' || tag === 'strong') newFormat |= 1
+              if (tag === 'i' || tag === 'em') newFormat |= 2
+              if (tag === 'u') newFormat |= 8
+              
+              el.childNodes.forEach(child => traverse(child, newFormat))
+            }
+          }
+          
+          element.childNodes.forEach(child => traverse(child))
+          return nodes
+        }
+
         submitData.description = {
           root: {
             type: 'root',
@@ -166,9 +213,7 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
                 format: '',
                 indent: 0,
                 version: 1,
-                children: [
-                   { type: 'text', text: text, version: 1 }
-                ]
+                children: parseHTMLToLexical(editorRef.current)
               }
             ]
           }
@@ -183,7 +228,9 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
 
       if (!res.ok) {
         const err = await res.json()
-        throw new Error(err.errors?.[0]?.message || 'Sikertelen mentés')
+        console.error('Payload validation error:', err)
+        const detail = err.errors?.[0]?.message || 'Sikertelen mentés'
+        throw new Error(detail)
       }
 
       setModalConfig({
@@ -318,7 +365,10 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
                   className="richtext-content" 
                   contentEditable 
                   suppressContentEditableWarning
-                  onBlur={e => setProduct(prev => prev ? { ...prev, description: e.currentTarget.innerHTML } : null)}
+                  onBlur={e => {
+                    const html = e.currentTarget.innerHTML
+                    setProduct(prev => prev ? { ...prev, description: html } : null)
+                  }}
                 >
                   {/* We need a proper way to handle initial Lexical JSON here if needed */}
                 </div>
@@ -339,14 +389,14 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
                 <label className="field-label">Kiszerelés</label>
                 <select 
                   className="field-select"
-                  value={product?.unit || 'pc'}
+                  value={product?.unit || 'db'}
                   onChange={e => setProduct(prev => prev ? { ...prev, unit: e.target.value } : null)}
                 >
-                  <option value="pc">Darab</option>
-                  <option value="kg">Kilogramm</option>
-                  <option value="g">Gramm</option>
-                  <option value="l">Liter</option>
-                  <option value="ml">Milliliter</option>
+                  <option value="db">Darab (db)</option>
+                  <option value="kg">Kilogramm (kg)</option>
+                  <option value="g">Gramm (g)</option>
+                  <option value="l">Liter (l)</option>
+                  <option value="dl">Deciliter (dl)</option>
                 </select>
               </div>
             </div>
