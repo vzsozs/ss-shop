@@ -14,6 +14,7 @@ import { ProductEditView as ProductEditView_ce9c3171f14cb38cb7fc8d41e70d0b85 } f
 import { CustomSlides as CustomSlides_f253986b04b3c2b4f246d23e9cc5fe85 } from '../../../components/Admin/CustomSlides'
 import { SlideEditView as SlideEditView_da1ce318428daf961cb8c5700c21341c } from '../../../components/Admin/SlideEditView'
 import { CustomUsers as CustomUsers_412dc4c51e691e9234042ff560b00121 } from '../../../components/Admin/CustomUsers'
+import { UserEditView as UserEditView_6a743ac79add6f3c45217d0a6b17ea33 } from '../../../components/Admin/UserEditView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -33,5 +34,6 @@ export const importMap = {
   "./components/Admin/CustomSlides#CustomSlides": CustomSlides_f253986b04b3c2b4f246d23e9cc5fe85,
   "./components/Admin/SlideEditView#SlideEditView": SlideEditView_da1ce318428daf961cb8c5700c21341c,
   "./components/Admin/CustomUsers#CustomUsers": CustomUsers_412dc4c51e691e9234042ff560b00121,
+  "./components/Admin/UserEditView#UserEditView": UserEditView_6a743ac79add6f3c45217d0a6b17ea33,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

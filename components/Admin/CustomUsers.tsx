@@ -142,7 +142,7 @@ export const CustomUsers: React.FC = () => {
               </div>
             )}
             <Link 
-            href="/admin/collections/users/create"
+            href="/admin/custom-users/create"
             className="add-new-btn"
           >
             <Plus size={18} />
@@ -191,7 +191,7 @@ export const CustomUsers: React.FC = () => {
                     <td>{formatDate(user.createdAt)}</td>
                     <td>
                       <Link 
-                        href={`/admin/collections/users/${user.id}`}
+                        href={`/admin/custom-users/${user.id}`}
                         className="action-btn-circle"
                         title="Szerkesztés"
                       >

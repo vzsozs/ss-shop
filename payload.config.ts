@@ -52,6 +52,10 @@ export default buildConfig({
           Component: './components/Admin/CustomUsers#CustomUsers',
           path: '/custom-users',
         },
+        'custom-user-edit': {
+          Component: './components/Admin/UserEditView#UserEditView',
+          path: '/custom-users/:id',
+        },
       },
     },
   },
