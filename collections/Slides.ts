@@ -2,7 +2,7 @@ import { CollectionConfig } from 'payload'
 import { revalidatePath } from 'next/cache'
 
 export const Slides: CollectionConfig = {
-  slug: 'slides',
+  slug: 'menu-slides',
   labels: {
     singular: 'Étlap',
     plural: 'Étlapok',
@@ -25,7 +25,7 @@ export const Slides: CollectionConfig = {
       required: true,
     },
     {
-      name: 'image',
+      name: 'backgroundImage',
       label: 'Háttérkép',
       type: 'upload',
       relationTo: 'media',
@@ -33,9 +33,19 @@ export const Slides: CollectionConfig = {
     },
     {
       name: 'category',
-      label: 'Kategória megnevezés',
-      type: 'text',
+      label: 'Kategória',
+      type: 'relationship',
+      relationTo: 'categories',
       required: true,
+    },
+    {
+      name: 'showOnHomepage',
+      label: 'Főoldalon megjelenik',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: {
+        position: 'sidebar',
+      },
     },
     {
       name: 'prices',

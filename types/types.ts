@@ -21,6 +21,7 @@ export interface SlideData {
   categoryDescription?: string;
   categoryCta?: { label: string; href: string; iconType: string; text?: string };
   prices?: PriceItem[];
+  showOnHomepage?: boolean;
 }
 
 export interface Category {
@@ -42,6 +43,7 @@ export interface Product {
   showInSlider: boolean;
   features?: {
     feature: string;
+    value: string;
   }[];
   image: string;
 }

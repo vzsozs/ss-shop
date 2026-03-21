@@ -40,6 +40,14 @@ export default buildConfig({
           Component: './components/Admin/ProductEditView#ProductEditView',
           path: '/custom-products/:id',
         },
+        'custom-slides': {
+          Component: './components/Admin/CustomSlides#CustomSlides',
+          path: '/custom-slides',
+        },
+        'custom-slide-edit': {
+          Component: './components/Admin/SlideEditView#SlideEditView',
+          path: '/custom-slides/:id',
+        },
       },
     },
   },

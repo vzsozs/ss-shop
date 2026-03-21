@@ -47,9 +47,15 @@ export async function getSlidesData(): Promise<SlideData[]> {
       depth: 2,
     })
 
-    // 2. Fetch "Étlapok" (from slides collection)
+    // 2. Fetch "Étlapok" (from menu-slides collection)
     const { docs: menuDocs } = await payload.find({
-      collection: 'slides',
+      collection: 'menu-slides',
+      where: {
+        or: [
+          { showOnHomepage: { equals: true } },
+          { showOnHomepage: { exists: false } }
+        ]
+      },
       depth: 2,
     })
 
@@ -103,19 +109,28 @@ export async function getSlidesData(): Promise<SlideData[]> {
       };
     });
 
-    const menuSlides = (menuDocs as Record<string, unknown>[]).map((doc) => ({
-      id: `menu-${doc.id}`,
-      name: String(doc.name),
-      description: String(doc.description),
-      image: mapImageUrl(doc.image),
-      category: String(doc.category),
-      layoutType: 'price-list' as const,
-      prices: Array.isArray(doc.prices) ? doc.prices.map((p: Record<string, unknown>) => ({
-        name: String(p.name),
-        price: String(p.price),
-        description: p.description ? String(p.description) : undefined
-      })) : undefined
-    }));
+    const menuSlides = (menuDocs as Record<string, unknown>[]).map((doc) => {
+      const cat = doc.category as Record<string, unknown> | null;
+      let categoryName = String(doc.category || '');
+      if (cat && typeof cat === 'object') {
+        categoryName = String(cat.name || '');
+      }
+
+      return {
+        id: `menu-${doc.id}`,
+        name: String(doc.name),
+        description: String(doc.description),
+        image: mapImageUrl(doc.backgroundImage),
+        category: categoryName,
+        layoutType: 'price-list' as const,
+        prices: Array.isArray(doc.prices) ? doc.prices.map((p: Record<string, unknown>) => ({
+          name: String(p.name),
+          price: String(p.price),
+          description: p.description ? String(p.description) : undefined
+        })) : undefined,
+        showOnHomepage: Boolean(doc.showOnHomepage)
+      };
+    });
 
     return [...productSlides, ...menuSlides];
     
@@ -145,7 +160,8 @@ export async function getProducts(): Promise<Product[]> {
       unit: String(doc.unit),
       showInSlider: Boolean(doc.showInSlider),
       features: Array.isArray(doc.features) ? (doc.features as Record<string, unknown>[]).map((f) => ({
-        feature: String(f.feature)
+        feature: String(f.feature),
+        value: String(f.value || '')
       })) : undefined,
       image: mapImageUrl(doc.image),
     }));
@@ -182,7 +198,8 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       unit: String(doc.unit),
       showInSlider: Boolean(doc.showInSlider),
       features: Array.isArray(doc.features) ? (doc.features as Record<string, unknown>[]).map((f) => ({
-        feature: String(f.feature)
+        feature: String(f.feature),
+        value: String(f.value || '')
       })) : undefined,
       image: mapImageUrl(doc.image),
     };
