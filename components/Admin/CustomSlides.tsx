@@ -14,7 +14,9 @@ interface Slide {
     url: string
   } | string
   showOnHomepage: boolean
-  category: string
+  category: {
+    name: string
+  } | string
 }
 
 export const CustomSlides: React.FC = () => {
@@ -124,6 +126,15 @@ export const CustomSlides: React.FC = () => {
         
         rest.name = `${rest.name} (másolat)`
         
+        // Handle nested array items (prices)
+        if (Array.isArray(rest.prices)) {
+          rest.prices = rest.prices.map((item: Record<string, unknown>) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { id: _, ...itemRest } = item
+            return itemRest
+          })
+        }
+        
         const createRes = await fetch('/api/menu-slides', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -223,6 +234,7 @@ export const CustomSlides: React.FC = () => {
                   </th>
                   <th style={{ width: '100px' }}>Háttérkép</th>
                   <th>Étlap neve</th>
+                  <th>Kategória</th>
                   <th>Főoldalon</th>
                   <th style={{ width: '60px' }}></th>
                 </tr>
@@ -258,6 +270,11 @@ export const CustomSlides: React.FC = () => {
                       </div>
                     </td>
                     <td className="name-cell">{slide.name}</td>
+                    <td>
+                      <span className="badge-branded">
+                        {slide.category && typeof slide.category === 'object' ? slide.category.name : 'Válassz!'}
+                      </span>
+                    </td>
                     <td>
                       <div className={`badge-active ${slide.showOnHomepage ? 'active' : ''}`}>
                          {slide.showOnHomepage ? 'Igen' : 'Nem'}

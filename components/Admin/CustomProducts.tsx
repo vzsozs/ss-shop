@@ -139,6 +139,15 @@ export const CustomProducts: React.FC = () => {
         
         rest.name = `${rest.name} (másolat)`
         
+        // Handle nested array items (features)
+        if (Array.isArray(rest.features)) {
+          rest.features = rest.features.map((item: Record<string, unknown>) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { id: _, ...itemRest } = item
+            return itemRest
+          })
+        }
+        
         const createRes = await fetch('/api/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

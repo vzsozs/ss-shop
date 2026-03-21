@@ -48,6 +48,10 @@ export default buildConfig({
           Component: './components/Admin/SlideEditView#SlideEditView',
           path: '/custom-slides/:id',
         },
+        'custom-users': {
+          Component: './components/Admin/CustomUsers#CustomUsers',
+          path: '/custom-users',
+        },
       },
     },
   },
