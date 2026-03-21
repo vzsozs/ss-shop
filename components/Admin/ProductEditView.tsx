@@ -14,7 +14,7 @@ interface Product {
   price: number
   category: string | { id: string, name: string }
   unit: string
-  features: { feature: string }[]
+  features: { feature: string, value: string }[]
   image: { id: string, url: string } | string | null
   showInSlider: boolean
   slug: string
@@ -289,14 +289,14 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
   }
 
   const addFeature = () => {
-    setProduct(prev => prev ? { ...prev, features: [...prev.features, { feature: '' }] } : null)
+    setProduct(prev => prev ? { ...prev, features: [...prev.features, { feature: '', value: '' }] } : null)
   }
 
-  const updateFeature = (index: number, value: string) => {
+  const updateFeature = (index: number, key: 'feature' | 'value', value: string) => {
     setProduct(prev => {
       if (!prev) return null
       const newFeatures = [...prev.features]
-      newFeatures[index] = { feature: value }
+      newFeatures[index] = { ...newFeatures[index], [key]: value }
       return { ...prev, features: newFeatures }
     })
   }
@@ -320,18 +320,18 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
       
       <main className="custom-admin-main">
         <div className="view-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-             <div className="switch-card">
-              <span className="switch-label">Slider</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <div className="view-title">
+              <h1>{isNew ? 'Új Termék' : 'Termék Szerkesztése'}</h1>
+            </div>
+            <div className="switch-card">
+              <span className="switch-label">Megjelenítés</span>
               <div 
                 className={`switch-container ${product?.showInSlider ? 'active' : ''}`}
                 onClick={() => setProduct(prev => prev ? { ...prev, showInSlider: !prev.showInSlider } : null)}
               >
                 <div className="switch-handle" />
               </div>
-            </div>
-            <div className="view-title">
-              <h1>{isNew ? 'Új Termék' : 'Termék Szerkesztése'}</h1>
             </div>
           </div>
         </div>
@@ -419,15 +419,24 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
               <label className="field-label">Tulajdonságok</label>
               <div className="array-field-container">
                 {product?.features.map((feat, index) => (
-                  <div key={index} className="array-item-row">
+                  <div key={index} className="array-item-row" style={{ display: 'flex', gap: '1rem', marginBottom: '0.8rem' }}>
                     <input 
                       type="text" 
                       className="field-input array-input"
                       value={feat.feature}
-                      onChange={e => updateFeature(index, e.target.value)}
-                      placeholder="Pl. Laktózmentes"
+                      onChange={e => updateFeature(index, 'feature', e.target.value)}
+                      placeholder="Név (pl. Tápérték)"
+                      style={{ flex: 1 }}
                     />
-                    <button className="remove-item-btn" onClick={() => removeFeature(index)}>
+                    <input 
+                      type="text" 
+                      className="field-input array-input"
+                      value={feat.value}
+                      onChange={e => updateFeature(index, 'value', e.target.value)}
+                      placeholder="Érték (pl. 1350kJ)"
+                      style={{ flex: 1 }}
+                    />
+                    <button className="remove-item-btn" onClick={() => removeFeature(index)} style={{ flexShrink: 0 }}>
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -438,16 +447,6 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
               </div>
             </div>
 
-            <div className="form-group">
-              <label className="field-label">Slug (URL azonosító)</label>
-              <input 
-                type="text" 
-                className="field-input"
-                value={product?.slug || ''}
-                onChange={e => setProduct(prev => prev ? { ...prev, slug: e.target.value } : null)}
-                placeholder="szendvics-neve"
-              />
-            </div>
           </div>
 
           <div className="image-preview-card">
@@ -479,6 +478,18 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
                 onChange={handleImageUpload}
               />
             </label>
+
+            <div className="form-group" style={{ marginTop: '2rem', textAlign: 'left' }}>
+              <label className="field-label">Slug (URL azonosító)</label>
+              <input 
+                type="text" 
+                className="field-input"
+                value={product?.slug || ''}
+                onChange={e => setProduct(prev => prev ? { ...prev, slug: e.target.value } : null)}
+                placeholder="szendvics-neve"
+                style={{ background: 'white' }}
+              />
+            </div>
           </div>
         </div>
 

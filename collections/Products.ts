@@ -112,7 +112,13 @@ export const Products: CollectionConfig = {
       fields: [
         {
           name: 'feature',
-          label: 'Tulajdonság',
+          label: 'Tulajdonság neve',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'value',
+          label: 'Érték',
           type: 'text',
           required: true,
         },

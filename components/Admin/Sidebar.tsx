@@ -26,7 +26,7 @@ export const Sidebar: React.FC = () => {
     { label: 'Termékek (Saját)', slug: 'custom-products', href: '/admin/custom-products', icon: <ShoppingBag size={18} /> },
     { label: 'Kategóriák (Saját)', slug: 'custom-categories', href: '/admin/custom-categories', icon: <Tag size={20} />, quickAdd: '/admin/custom-categories/create' },
     { label: 'Kategóriák', slug: 'categories', href: '/admin/collections/categories', icon: <Layers size={18} /> },
-    { label: 'Kezdőlap Slider', slug: 'home-slider', href: '/admin/collections/slides', icon: <LayoutGrid size={18} /> }, // Modified/added slider link
+    { label: 'Étlapok', slug: 'home-slider', href: '/admin/collections/slides', icon: <LayoutGrid size={18} /> }, // Modified/added slider link
     { label: 'Média', slug: 'media', href: '/admin/collections/media', icon: <ImageIcon size={18} /> },
     { label: 'Felhasználók', slug: 'users', href: '/admin/collections/users', icon: <Users size={18} /> },
   ]
