@@ -1,5 +1,5 @@
 import { CollectionConfig } from 'payload'
-import { revalidatePath } from 'next/cache'
+// import { revalidatePath } from 'next/cache'
 import {
   BoldFeature,
   ItalicFeature,
@@ -22,15 +22,6 @@ export const Products: CollectionConfig = {
   },
   fields: [
     {
-      name: 'archived',
-      label: 'Archivált (nem választható)',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
       name: 'showInSlider',
       label: 'Megjelenítés a főoldali sliderben',
       type: 'checkbox',
@@ -41,7 +32,7 @@ export const Products: CollectionConfig = {
     },
     {
       name: 'name',
-      label: 'Terméknév (admin/termekek 6)',
+      label: 'Terméknév',
       type: 'text',
       required: true,
     },
@@ -77,40 +68,32 @@ export const Products: CollectionConfig = {
     },
     {
       name: 'description',
-      label: 'Leírás (admin/termekek 5)',
+      label: 'Leírás',
       type: 'richText',
       editor: lexicalEditor({
         features: () => [
           BoldFeature(),
           ItalicFeature(),
-          LinkFeature({
-            enabledCollections: ['products'], // Allow internal links to other products
-          }),
+          LinkFeature({}),
         ],
       }),
     },
     {
       name: 'price',
-      label: 'Ár (Ft) (admin/termekek 12)',
+      label: 'Ár (Ft)',
       type: 'number',
       required: true,
-      validate: (value: unknown) => {
-        if (typeof value !== 'number' || value <= 0 || !Number.isInteger(value)) {
-          return 'Az árnak pozitív egész számnak kell lennie.'
-        }
-        return true
-      },
     },
     {
       name: 'category',
-      label: 'Kategória (admin/termekek 13)',
+      label: 'Kategória',
       type: 'relationship',
       relationTo: 'categories',
       required: true,
     },
     {
       name: 'unit',
-      label: 'Kiszerelés (admin/termekek 14)',
+      label: 'Kiszerelés',
       type: 'select',
       required: true,
       defaultValue: 'db',
@@ -118,20 +101,18 @@ export const Products: CollectionConfig = {
         { label: 'db', value: 'db' },
         { label: 'g', value: 'g' },
         { label: 'dl', value: 'dl' },
+        { label: 'kg', value: 'kg' },
+        { label: 'l', value: 'l' },
       ],
     },
     {
       name: 'features',
-      label: 'Tulajdonságok (admin/termekek 15)',
+      label: 'Tulajdonságok',
       type: 'array',
       fields: [
         {
-          name: 'tulajdonság_neve',
-          type: 'text',
-          required: true,
-        },
-        {
-          name: 'érték',
+          name: 'feature',
+          label: 'Tulajdonság',
           type: 'text',
           required: true,
         },
@@ -139,7 +120,7 @@ export const Products: CollectionConfig = {
     },
     {
       name: 'image',
-      label: 'Termékkép (admin/termekek 4)',
+      label: 'Termékkép',
       type: 'upload',
       relationTo: 'media',
       required: true,
@@ -148,15 +129,15 @@ export const Products: CollectionConfig = {
   hooks: {
     afterChange: [
       ({ doc }) => {
-        revalidatePath('/')
-        revalidatePath(`/termek/${doc.slug}`)
+        // revalidatePath('/')
+        // revalidatePath(`/termek/${doc.slug}`)
         console.log(`ISR Revalidálás: / és /termek/${doc.slug}`)
       },
     ],
     afterDelete: [
       ({ doc }) => {
-        revalidatePath('/')
-        revalidatePath(`/termek/${doc.slug}`)
+        // revalidatePath('/')
+        // revalidatePath(`/termek/${doc.slug}`)
         console.log(`ISR Revalidálás: / és /termek/${doc.slug}`)
       },
     ],

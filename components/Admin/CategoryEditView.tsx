@@ -129,12 +129,13 @@ export const CategoryEditView: React.FC<{ params: { id: string } }> = (props) =>
         type: 'success',
         onConfirm: () => router.push('/admin/custom-categories')
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Mentési hiba:', error)
+      const message = error instanceof Error ? error.message : 'Ismeretlen hiba történt a mentés során.'
       setModalConfig({
         isOpen: true,
         title: 'Hiba a mentés során',
-        message: error.message || 'Ismeretlen hiba történt a mentés során.',
+        message: message,
         type: 'error'
       })
     } finally {

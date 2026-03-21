@@ -20,7 +20,7 @@ const Layout = ({ children }: Args) => (
   <RootLayout 
     config={config} 
     importMap={importMap} 
-    serverFunction={serverFunction as any}
+    serverFunction={serverFunction as (args: unknown) => Promise<unknown>}
   >
     <div className={`${rokkitt.variable} font-rokkitt`}>
       {children}

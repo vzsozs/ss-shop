@@ -1,4 +1,4 @@
-import { NotFoundPage } from '@payloadcms/next/views'
+import { NotFoundPage, generatePageMetadata } from '@payloadcms/next/views'
 import config from '../../../../payload.config'
 import { importMap } from '../importMap'
 
@@ -11,7 +11,15 @@ type Args = {
   }>
 }
 
+export const generateMetadata = ({ params, searchParams }: Args) =>
+  generatePageMetadata({ config, params, searchParams })
+
 const NotFound = ({ params, searchParams }: Args) => 
-  NotFoundPage({ config, importMap, params, searchParams })
+  NotFoundPage({ 
+    config, 
+    importMap, 
+    params, 
+    searchParams 
+  })
 
 export default NotFound

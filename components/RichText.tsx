@@ -46,11 +46,11 @@ export const RichText: React.FC<{ content: unknown; className?: string }> = ({ c
       case 'paragraph':
         return <p key={index} className="mb-2 last:mb-0">{children}</p>;
       case 'link':
-        const fields = node.fields as Record<string, any> | undefined;
+        const fields = node.fields as Record<string, unknown> | undefined;
         return (
           <a 
             key={index} 
-            href={fields?.url} 
+            href={fields?.url as string} 
             target={fields?.newTab ? '_blank' : undefined} 
             rel={fields?.newTab ? 'noopener noreferrer' : undefined} 
             className="text-brand-brown underline decoration-brand-brown/30 hover:decoration-brand-brown transition-all"
@@ -68,8 +68,8 @@ export const RichText: React.FC<{ content: unknown; className?: string }> = ({ c
     }
   };
 
-  const data = content as any;
-  const root = data?.root || data;
+  const data = content as { root?: LexicalNode } | null;
+  const root = data?.root || (data as unknown as LexicalNode);
   
   if (!root) return null;
   

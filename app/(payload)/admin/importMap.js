@@ -4,12 +4,13 @@ import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8c
 import { LinkFeatureClient as LinkFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { Sidebar as Sidebar_42c1b1fca280f6ab74c449b898855dad } from '../../../components/Admin/Sidebar'
-import { Icon as Icon_99e92778bd4fac64f47ce20c43bed673 } from '../../../components/Brand/Icon'
-import { Logo as Logo_916eb612e9f601e5b291450eb0853f62 } from '../../../components/Brand/Logo'
-import { CustomProducts as CustomProducts_c0da9fa41f93b25be583af0444ac39b7 } from '../../../components/Admin/CustomProducts'
-import { CustomCategories as CustomCategories_2b5b97fb9fc89d04ab9305d0458a56ef } from '@/components/Admin/CustomCategories'
-import { CategoryEditView as CategoryEditView_9cf11379012f5a159a2cf0f2f67120ab } from '@/components/Admin/CategoryEditView'
+import { Sidebar as Sidebar_6c6d7d3b04cbafc7211496f89b027c54 } from '../../../components/Admin/Sidebar'
+import { Icon as Icon_4cf235349838aaab5dda1a38af0a9d18 } from '../../../components/Brand/Icon'
+import { Logo as Logo_18e2fcdffe45595c68167a75bb9ecfa3 } from '../../../components/Brand/Logo'
+import { CustomProducts as CustomProducts_8415f36be369ad4e3a0abc01e3184f12 } from '../../../components/Admin/CustomProducts'
+import { CustomCategories as CustomCategories_05005f9d6f280f82f1d2fcca3c686699 } from '../../../components/Admin/CustomCategories'
+import { CategoryEditView as CategoryEditView_a4fbecc3a77ec3729ebec21c09dc6a66 } from '../../../components/Admin/CategoryEditView'
+import { ProductEditView as ProductEditView_ce9c3171f14cb38cb7fc8d41e70d0b85 } from '../../../components/Admin/ProductEditView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -19,11 +20,12 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#LinkFeatureClient": LinkFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "/components/Admin/Sidebar#Sidebar": Sidebar_42c1b1fca280f6ab74c449b898855dad,
-  "/components/Brand/Icon#Icon": Icon_99e92778bd4fac64f47ce20c43bed673,
-  "/components/Brand/Logo#Logo": Logo_916eb612e9f601e5b291450eb0853f62,
-  "/components/Admin/CustomProducts#CustomProducts": CustomProducts_c0da9fa41f93b25be583af0444ac39b7,
-  "@/components/Admin/CustomCategories#CustomCategories": CustomCategories_2b5b97fb9fc89d04ab9305d0458a56ef,
-  "@/components/Admin/CategoryEditView#CategoryEditView": CategoryEditView_9cf11379012f5a159a2cf0f2f67120ab,
+  "./components/Admin/Sidebar#Sidebar": Sidebar_6c6d7d3b04cbafc7211496f89b027c54,
+  "./components/Brand/Icon#Icon": Icon_4cf235349838aaab5dda1a38af0a9d18,
+  "./components/Brand/Logo#Logo": Logo_18e2fcdffe45595c68167a75bb9ecfa3,
+  "./components/Admin/CustomProducts#CustomProducts": CustomProducts_8415f36be369ad4e3a0abc01e3184f12,
+  "./components/Admin/CustomCategories#CustomCategories": CustomCategories_05005f9d6f280f82f1d2fcca3c686699,
+  "./components/Admin/CategoryEditView#CategoryEditView": CategoryEditView_a4fbecc3a77ec3729ebec21c09dc6a66,
+  "./components/Admin/ProductEditView#ProductEditView": ProductEditView_ce9c3171f14cb38cb7fc8d41e70d0b85,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

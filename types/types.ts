@@ -39,11 +39,9 @@ export interface Product {
   price: number;
   category: string | Category;
   unit: string;
-  archived: boolean;
   showInSlider: boolean;
   features?: {
-    tulajdonság_neve: string;
-    érték: string;
+    feature: string;
   }[];
   image: string;
 }

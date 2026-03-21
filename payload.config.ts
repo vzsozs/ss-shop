@@ -18,23 +18,27 @@ export default buildConfig({
   admin: {
     user: 'users',
     components: {
-      Nav: '/components/Admin/Sidebar#Sidebar',
+      Nav: './components/Admin/Sidebar#Sidebar',
       graphics: {
-        Logo: '/components/Brand/Logo#Logo',
-        Icon: '/components/Brand/Icon#Icon',
+        Logo: './components/Brand/Logo#Logo',
+        Icon: './components/Brand/Icon#Icon',
       },
       views: {
         CustomProducts: {
-          Component: '/components/Admin/CustomProducts#CustomProducts',
+          Component: './components/Admin/CustomProducts#CustomProducts',
           path: '/custom-products',
         },
         'custom-categories': {
-          Component: '@/components/Admin/CustomCategories#CustomCategories',
+          Component: './components/Admin/CustomCategories#CustomCategories',
           path: '/custom-categories',
         },
         'custom-category-edit': {
-          Component: '@/components/Admin/CategoryEditView#CategoryEditView',
+          Component: './components/Admin/CategoryEditView#CategoryEditView',
           path: '/custom-categories/:id',
+        },
+        'custom-product-edit': {
+          Component: './components/Admin/ProductEditView#ProductEditView',
+          path: '/custom-products/:id',
         },
       },
     },
@@ -65,3 +69,4 @@ export default buildConfig({
     supportedLanguages: { hu },
   },
 })
+// Last update: 03/21/2026 05:58:04

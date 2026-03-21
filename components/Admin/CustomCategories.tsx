@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { Plus, ChevronRight, Trash2, Copy, Check } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Sidebar } from './Sidebar'
 import { Modal } from './Modal'
 
@@ -251,11 +252,14 @@ export const CustomCategories: React.FC = () => {
                     <td className="img-cell">
                       <div className="img-container">
                         {category.image && typeof category.image === 'object' && category.image.url ? (
-                          <img 
-                            src={category.image.url} 
-                            alt="" 
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                          />
+                          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                            <Image 
+                              src={category.image.url} 
+                              alt={category.name} 
+                              fill
+                              style={{ objectFit: 'cover' }} 
+                            />
+                          </div>
                         ) : (
                           <div style={{ width: '100%', height: '100%', background: '#eee' }} />
                         )}

@@ -41,7 +41,6 @@ export async function getSlidesData(): Promise<SlideData[]> {
       collection: 'products',
       where: {
         and: [
-          { archived: { not_equals: true } },
           { showInSlider: { equals: true } }
         ]
       },
@@ -132,9 +131,6 @@ export async function getProducts(): Promise<Product[]> {
     const { docs } = await payload.find({
       collection: 'products',
       where: {
-        archived: {
-          not_equals: true,
-        },
       },
       depth: 1,
     })
@@ -147,11 +143,9 @@ export async function getProducts(): Promise<Product[]> {
       price: Number(doc.price),
       category: mapCategory(doc.category),
       unit: String(doc.unit),
-      archived: Boolean(doc.archived),
       showInSlider: Boolean(doc.showInSlider),
       features: Array.isArray(doc.features) ? (doc.features as Record<string, unknown>[]).map((f) => ({
-        tulajdonság_neve: String(f.tulajdonság_neve),
-        érték: String(f.érték)
+        feature: String(f.feature)
       })) : undefined,
       image: mapImageUrl(doc.image),
     }));
@@ -186,11 +180,9 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       price: Number(doc.price),
       category: mapCategory(doc.category),
       unit: String(doc.unit),
-      archived: Boolean(doc.archived),
       showInSlider: Boolean(doc.showInSlider),
       features: Array.isArray(doc.features) ? (doc.features as Record<string, unknown>[]).map((f) => ({
-        tulajdonság_neve: String(f.tulajdonság_neve),
-        érték: String(f.érték)
+        feature: String(f.feature)
       })) : undefined,
       image: mapImageUrl(doc.image),
     };

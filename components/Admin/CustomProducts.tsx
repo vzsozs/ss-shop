@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { Plus, ChevronRight, Trash2, Copy, Check } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Sidebar } from './Sidebar'
 import { Modal } from './Modal'
 
@@ -101,12 +102,13 @@ export const CustomProducts: React.FC = () => {
         message: 'A kijelölt termékeket sikeresen eltávolítottuk.',
         type: 'success'
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Hiba a törlés során:', error)
+      const message = error instanceof Error ? error.message : 'Ismeretlen hiba történt a törlés során.'
       setModalConfig({
         isOpen: true,
         title: 'Hiba a törlés során',
-        message: error.message || 'Ismeretlen hiba történt a törlés során.',
+        message: message,
         type: 'error'
       })
     } finally {
@@ -156,12 +158,13 @@ export const CustomProducts: React.FC = () => {
         message: 'A kijelölt termékeket sikeresen lemásoltuk.',
         type: 'success'
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Hiba a duplikálás során:', error)
+      const message = error instanceof Error ? error.message : 'Ismeretlen hiba történt a duplikálás során.'
       setModalConfig({
         isOpen: true,
         title: 'Hiba a duplikálás során',
-        message: error.message || 'Ismeretlen hiba történt a duplikálás során.',
+        message: message,
         type: 'error'
       })
     } finally {
@@ -206,7 +209,7 @@ export const CustomProducts: React.FC = () => {
                 </span>
               </div>
             )}
-            <Link href="/admin/collections/products/create" className="create-btn">
+            <Link href="/admin/custom-products/create" className="create-btn">
               <Plus size={20} />
               Új Termék
             </Link>
@@ -255,11 +258,14 @@ export const CustomProducts: React.FC = () => {
                     <td className="img-cell">
                       <div className="img-container">
                         {product.image && typeof product.image === 'object' && product.image.url ? (
-                          <img 
-                            src={product.image.url} 
-                            alt="" 
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                          />
+                          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                            <Image 
+                              src={product.image.url} 
+                              alt={product.name} 
+                              fill
+                              style={{ objectFit: 'cover' }} 
+                            />
+                          </div>
                         ) : (
                           <div style={{ width: '100%', height: '100%', background: '#eee' }} />
                         )}
@@ -281,7 +287,7 @@ export const CustomProducts: React.FC = () => {
                       </div>
                     </td>
                     <td>
-                      <Link href={`/admin/collections/products/${product.id}`} className="edit-link">
+                      <Link href={`/admin/custom-products/${product.id}`} className="edit-link">
                         <ChevronRight size={20} />
                       </Link>
                     </td>

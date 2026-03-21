@@ -1,0 +1,7 @@
+﻿payload.config.ts(72,2): error TS1127: Invalid character.
+payload.config.ts(72,38): error TS1127: Invalid character.
+payload.config.ts(72,40): error TS1127: Invalid character.
+payload.config.ts(72,42): error TS1127: Invalid character.
+payload.config.ts(72,43): error TS1161: Unterminated regular expression literal.
+payload.config.ts(73,1): error TS1127: Invalid character.
+payload.config.ts(74,1): error TS1127: Invalid character.
