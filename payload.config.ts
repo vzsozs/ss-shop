@@ -18,9 +18,24 @@ export default buildConfig({
   admin: {
     user: 'users',
     components: {
+      Nav: '/components/Admin/Sidebar#Sidebar',
       graphics: {
         Logo: '/components/Brand/Logo#Logo',
         Icon: '/components/Brand/Icon#Icon',
+      },
+      views: {
+        CustomProducts: {
+          Component: '/components/Admin/CustomProducts#CustomProducts',
+          path: '/custom-products',
+        },
+        'custom-categories': {
+          Component: '@/components/Admin/CustomCategories#CustomCategories',
+          path: '/custom-categories',
+        },
+        'custom-category-edit': {
+          Component: '@/components/Admin/CategoryEditView#CategoryEditView',
+          path: '/custom-categories/:id',
+        },
       },
     },
   },

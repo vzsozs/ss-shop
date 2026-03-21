@@ -15,7 +15,7 @@ export const Products: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'price', 'category', 'archived', 'slug'],
+    defaultColumns: ['image', 'name', 'category', 'showInSlider'],
   },
   access: {
     read: () => true,
@@ -57,8 +57,20 @@ export const Products: CollectionConfig = {
       hooks: {
         beforeValidate: [
           ({ value, data }) => {
-            if (value) return value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
-            return data?.name?.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
+            const transliterate = (text: string) => {
+              const charMap: Record<string, string> = {
+                'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ö': 'o', 'ő': 'o', 'ú': 'u', 'ü': 'u', 'ű': 'u',
+                'Á': 'a', 'É': 'e', 'Í': 'i', 'Ó': 'o', 'Ö': 'o', 'Ő': 'o', 'Ú': 'u', 'Ü': 'u', 'Ű': 'u'
+              }
+              return text.replace(/[áéíóöőúüűÁÉÍÓÖŐÚÜŰ]/g, match => charMap[match] || match)
+            }
+            
+            const sourceText = value || data?.name || ''
+            return transliterate(sourceText)
+              .toLowerCase()
+              .trim()
+              .replace(/ /g, '-')
+              .replace(/[^\w-]+/g, '')
           },
         ],
       },

@@ -24,8 +24,8 @@ export default function HeroCard({ data }: { data: SlideData }) {
   };
 
   return (
-    <div className="flex justify-center items-stretch w-full max-w-[1500px] mx-auto px-4 md:px-16 py-8 md:py-16 h-full box-border max-md:pt-48">
-      <div className="grid grid-cols-2 gap-0 self-center w-full h-full p-4 md:p-12 overflow-hidden max-md:flex max-md:flex-col max-md:justify-center max-md:items-center max-md:gap-4 max-md:h-auto max-md:overflow-visible relative">
+    <div className="flex justify-center items-stretch w-full max-w-[1500px] mx-auto px-4 md:px-16 py-8 md:py-16 h-full box-border max-md:pt-[46vw]">
+      <div className="grid grid-cols-2 gap-0 self-center w-full h-full p-4 md:p-12 overflow-hidden max-md:flex max-md:flex-col max-md:justify-center max-md:items-center max-md:gap-[3.8vw] max-md:h-auto max-md:overflow-visible relative">
         
         {/* Left Content - Category Area */}
         <motion.div 
@@ -40,15 +40,15 @@ export default function HeroCard({ data }: { data: SlideData }) {
           <div className="text-left w-full max-w-[500px] mb-8 max-md:text-center max-md:mb-0 relative border border-green-500/20 p-2">
             <span className="absolute top-0 right-0 text-[8px] bg-green-500 text-white px-1">pub:6</span>
             {/* pub:6 = admin/kategoriak 2 (Category Description) */}
-            <h1 className="text-[6vw] leading-[0.75] xl:text-[5.5em] max-md:text-[2.5rem] font-extrabold break-words hyphens-auto max-md:leading-[1] mb-4 tracking-[-0.02em]">
+            <h1 className="text-[6vw] leading-[0.75] xl:text-[5.5em] max-md:text-[9.6vw] font-extrabold break-words hyphens-auto max-md:leading-[0.8] mb-4 tracking-[-0.02em]">
               {categoryDescription}
             </h1>
 
             <div className="relative border border-yellow-500/30 p-1">
               <span className="absolute -top-3 left-0 text-[8px] bg-yellow-500 text-white px-1">pub:2</span>
               {categoryCta && (
-                <div className="flex flex-row items-center gap-3 mt-3 max-md:flex-col max-md:items-center max-md:gap-1 flex-wrap">
-                  <span className="text-[#333333] font-normal uppercase tracking-widest text-[1rem] font-rokkitt">
+                <div className="flex flex-row items-center gap-3 mt-3 max-md:flex-col max-md:items-center max-md:gap-[1vw] flex-wrap">
+                  <span className="text-[#333333] font-normal uppercase tracking-widest text-[1rem] font-rokkitt max-md:text-[3.8vw]">
                     {categoryCta.text}
                   </span>
                   <Link 
@@ -104,14 +104,14 @@ export default function HeroCard({ data }: { data: SlideData }) {
           )}
           
           {/* Product Description */}
-          <div className="z-[2] text-right mt-12 mb-8 relative max-md:text-center max-md:w-full max-md:mx-auto max-md:mt-4 max-md:mb-16 max-md:px-4 border border-orange-500/30 p-2">
+          <div className="z-[2] text-right mt-12 mb-8 relative max-md:text-center max-md:w-full max-md:mx-auto max-md:mt-[3.8vw] max-md:mb-[15.4vw] max-md:px-[3.8vw] border border-orange-500/30 p-2">
             {/* pub:5 = admin/termekek 6 (Product Name) */}
             <span className="absolute -top-3 right-0 text-[8px] bg-orange-500 text-white px-1">pub:5</span>
-            <h2 className="text-[32px] font-bold leading-[36px] mb-2.5 max-md:text-[24px]">
+            <h2 className="text-[32px] font-bold leading-[36px] mb-2.5 max-md:text-[5.8vw] max-md:leading-[1.1]">
               <strong>{name}</strong>
             </h2>
             {/* admin/termekek 5 (Product Description) */}
-            <div className="text-right ml-auto max-w-[35vw] text-[1.2vw] leading-[1.3em] opacity-70 max-md:text-center max-md:mx-auto max-md:max-w-[85vw] max-md:text-[4vw] italic">
+            <div className="text-right ml-auto max-w-[35vw] text-[1.2vw] leading-[1.3em] opacity-70 max-md:text-center max-md:mx-auto max-md:max-w-[85vw] max-md:text-[3.5vw] italic">
               <RichText content={productDescription} />
             </div>
           </div>
