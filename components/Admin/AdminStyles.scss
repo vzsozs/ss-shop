@@ -240,7 +240,7 @@ aside.nav header {
   margin-right: 0.6rem;
 
   &.status-active { background: #ff5e00; box-shadow: 0 0 8px rgba(255, 94, 0, 0.5); }
-  &.status-inactive { background: #bbb; }
+  &.status-inactive { background: #888; }
 }
 
 .edit-link {
@@ -1130,4 +1130,189 @@ h1.dashboard__header {
     border-color: #775a2b;
     color: #ff5e00;
   }
+}
+/* --- Responsive Design / Mobile Optimization --- */
+
+.mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 1001;
+  width: 44px;
+  height: 44px;
+  background: var(--brand-brown);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 99;
+}
+
+@media (max-width: 1024px) {
+  .mobile-menu-toggle {
+    display: flex;
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+
+  .custom-nav {
+    position: fixed !important;
+    left: -280px !important;
+    width: 280px !important;
+    transition: left 0.3s ease !important;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.2) !important;
+
+    &.open {
+      left: 0 !important;
+    }
+  }
+
+  .custom-admin-main {
+    padding: 6rem 1.5rem 3rem !important;
+    width: 100% !important;
+    flex: none !important;
+    max-width: 100% !important;
+  }
+
+  .view-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .view-title h1 {
+    font-size: 1.8rem;
+  }
+
+  .create-btn {
+    padding: 0.8rem;
+    min-width: 44px;
+    height: 44px;
+    justify-content: center;
+    border-radius: 12px;
+    
+    font-size: 0; /* Hide text */
+    gap: 0;
+
+    svg {
+      margin: 0;
+    }
+  }
+
+  /* Status switch optimization on mobile */
+  .switch-card {
+    padding: 0.4rem;
+    border-radius: 12px;
+    width: auto;
+    height: 44px;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    gap: 0;
+
+    .switch-label {
+      display: none; /* User requested: hide label on mobile */
+    }
+  }
+
+  .table-container {
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    width: 100%;
+  }
+
+  .custom-table {
+    min-width: auto;
+    
+    th, td {
+      padding: 0.6rem 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    /* Hide less important columns on mobile to fit screen */
+    /* We target specific columns by index, but protect the first (checkbox), second (image) and last (edit) */
+    
+    /* In Products (7 cols), Slides (6 cols), Categories (5 cols) - hide the 4th column (Category / CTA) */
+    th:nth-child(4), td:nth-child(4) {
+        display: none;
+    }
+
+    /* In Products (7 cols) - hide the 5th column (Price) */
+    th:nth-child(5), td:nth-child(5) {
+        &:not(:last-child) {
+            display: none;
+        }
+    }
+
+    /* For Status columns (Főoldalon) - Hide header and text, keep only dot */
+    /* Products: 6th col, Slides: 5th col */
+    th:nth-child(6), /* Products header */
+    .custom-table td:nth-child(6), /* Products cell text */
+    .custom-table td:nth-child(5) { /* Slides cell text */
+        font-size: 0;
+        .status-dot {
+            margin-right: 0;
+        }
+    }
+    
+    /* Ensure the last column (Edit) is always visible and small */
+    th:last-child, td:last-child {
+        display: table-cell !important;
+        width: 50px !important;
+        padding: 0.5rem !important;
+    }
+
+    .name-cell {
+        font-size: 0.95rem;
+        max-width: 100px; /* even smaller on mobile */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .img-cell .img-container {
+        width: 36px;
+        height: 36px;
+    }
+  }
+
+  .editor-footer {
+    padding: 1.5rem;
+    margin: 3rem -1.5rem -3rem;
+    gap: 1rem;
+
+    .save-btn, .cancel-btn {
+      padding: 0.8rem 1.5rem;
+      font-size: 0.9rem;
+      flex: 1;
+    }
+  }
+
+  .form-section {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+    .view-title h1 {
+        font-size: 1.5rem;
+    }
 }

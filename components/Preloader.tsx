@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import SwipeIndicator from "./SwipeIndicator";
 
 export default function Preloader() {
   const [loading, setLoading] = useState(true);
@@ -13,7 +14,10 @@ export default function Preloader() {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => setLoading(false), 500);
+          setTimeout(() => {
+            setLoading(false);
+            localStorage.setItem('ss-visited', 'true');
+          }, 500);
           return 100;
         }
         return prev + 2;
@@ -66,6 +70,12 @@ export default function Preloader() {
               priority
               className="w-[150px] md:w-[250px]"
             />
+            
+            {/* Swipe Indicator shown only on first visit within the preloader */}
+            {typeof window !== 'undefined' && !localStorage.getItem('ss-visited') && (
+              <SwipeIndicator mode="full" className="mt-12" />
+            )}
+
             <div className="w-[200px] h-[2px] bg-white/20 mt-8 relative overflow-hidden rounded-full">
               <motion.div
                 className="absolute inset-y-0 left-0 bg-brand-bg"

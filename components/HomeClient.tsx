@@ -3,12 +3,14 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Slide from "@/components/Slide";
+import SwipeIndicator from "@/components/SwipeIndicator";
 import { SlideData } from "@/types/types";
 
 export default function HomeClient({ slides }: { slides: SlideData[] }) {
   const [[page, direction], setPage] = useState([0, 0]);
   const [isAnimating, setIsAnimating] = useState(false);
-  const touchStartY = useRef<number | null>(null);
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const touchStartX = useRef<number | null>(null);
 
   const activeIndex = page;
   const totalSlides = slides.length + 1;
@@ -20,6 +22,7 @@ export default function HomeClient({ slides }: { slides: SlideData[] }) {
 
   const paginate = useCallback((newDirection: number) => {
     if (isAnimating) return;
+    setHasInteracted(true);
     const nextIndex = activeIndex + newDirection;
     if (nextIndex >= 0 && nextIndex < totalSlides) {
       setPage([nextIndex, newDirection]);
@@ -29,6 +32,7 @@ export default function HomeClient({ slides }: { slides: SlideData[] }) {
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
+      setHasInteracted(true);
       if (Math.abs(e.deltaY) < 10) return;
       if (e.deltaY > 0) paginate(1);
       else paginate(-1);
@@ -39,19 +43,20 @@ export default function HomeClient({ slides }: { slides: SlideData[] }) {
   }, [paginate]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
+    setHasInteracted(true);
+    touchStartX.current = e.touches[0].clientX;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartY.current === null) return;
-    const touchEndY = e.changedTouches[0].clientY;
-    const deltaY = touchStartY.current - touchEndY;
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const deltaX = touchStartX.current - touchEndX;
 
-    if (Math.abs(deltaY) > 50) {
-      if (deltaY > 0) paginate(1);
+    if (Math.abs(deltaX) > 50) {
+      if (deltaX > 0) paginate(1);
       else paginate(-1);
     }
-    touchStartY.current = null;
+    touchStartX.current = null;
   };
 
   const variants = {
@@ -158,6 +163,20 @@ export default function HomeClient({ slides }: { slides: SlideData[] }) {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         />
       </motion.div>
+
+      {/* Discrete Swipe Indicator on first slide */}
+      <AnimatePresence>
+        {activeIndex === 0 && !hasInteracted && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="fixed bottom-32 md:bottom-16 left-1/2 -translate-x-1/2 z-[60] pointer-events-none"
+          >
+            <SwipeIndicator mode="minimal" />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
