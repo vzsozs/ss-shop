@@ -188,7 +188,7 @@ export const CustomProducts: React.FC = () => {
       <main className="custom-admin-main">
         <div className="view-header">
           <div className="view-title">
-            <h1>Termékek (Saját)</h1>
+            <h1>Termékek</h1>
           </div>
           <div className="header-actions">
             {selectedIds.length > 0 && (

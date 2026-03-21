@@ -175,7 +175,7 @@ export const CustomSlides: React.FC = () => {
       <main className="custom-admin-main">
         <div className="view-header">
           <div className="view-title">
-            <h1>Étlapok (Saját)</h1>
+            <h1>Étlapok</h1>
           </div>
           <div className="header-actions">
             {selectedIds.length > 0 && (
@@ -207,10 +207,10 @@ export const CustomSlides: React.FC = () => {
             )}
             <Link 
             href="/admin/custom-slides/create"
-            className="add-new-btn"
+            className="create-btn"
           >
-            <Plus size={18} />
-            Új étlap hozzáadása
+            <Plus size={20} />
+            Új Étlap
           </Link>
           </div>
         </div>
@@ -276,17 +276,18 @@ export const CustomSlides: React.FC = () => {
                       </span>
                     </td>
                     <td>
-                      <div className={`badge-active ${slide.showOnHomepage ? 'active' : ''}`}>
-                         {slide.showOnHomepage ? 'Igen' : 'Nem'}
+                      <div style={{ display: 'flex', alignItems: 'center', fontWeight: 700 }}>
+                        <span className={`status-dot ${slide.showOnHomepage ? 'status-active' : 'status-inactive'}`} />
+                        {slide.showOnHomepage ? 'IGEN' : 'NEM'}
                       </div>
                     </td>
                     <td>
                       <Link 
                         href={`/admin/custom-slides/${slide.id}`}
-                        className="action-btn-circle"
+                        className="edit-link"
                         title="Szerkesztés"
                       >
-                        <ChevronRight size={18} />
+                        <ChevronRight size={20} />
                       </Link>
                     </td>
                   </tr>

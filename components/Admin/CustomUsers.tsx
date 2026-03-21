@@ -143,10 +143,10 @@ export const CustomUsers: React.FC = () => {
             )}
             <Link 
             href="/admin/custom-users/create"
-            className="add-new-btn"
+            className="create-btn"
           >
-            <Plus size={18} />
-            Új felhasználó hozzáadása
+            <Plus size={20} />
+            Új Felhasználó
           </Link>
           </div>
         </div>
@@ -192,10 +192,10 @@ export const CustomUsers: React.FC = () => {
                     <td>
                       <Link 
                         href={`/admin/custom-users/${user.id}`}
-                        className="action-btn-circle"
+                        className="edit-link"
                         title="Szerkesztés"
                       >
-                        <ChevronRight size={18} />
+                        <ChevronRight size={20} />
                       </Link>
                     </td>
                   </tr>

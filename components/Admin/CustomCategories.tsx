@@ -172,7 +172,7 @@ export const CustomCategories: React.FC = () => {
       <main className="custom-admin-main">
         <div className="view-header">
           <div className="view-title">
-            <h1>Kategóriák (Saját)</h1>
+            <h1>Kategóriák</h1>
           </div>
           <div className="header-actions">
             {selectedIds.length > 0 && (
@@ -204,10 +204,10 @@ export const CustomCategories: React.FC = () => {
             )}
             <Link 
             href="/admin/custom-categories/create"
-            className="add-new-btn"
+            className="create-btn"
           >
-            <Plus size={18} />
-            Kategória hozzáadása
+            <Plus size={20} />
+            Új Kategória
           </Link>
           </div>
         </div>
@@ -274,10 +274,10 @@ export const CustomCategories: React.FC = () => {
                     <td>
                       <Link 
                         href={`/admin/custom-categories/${category.id}`}
-                        className="action-btn-circle"
+                        className="edit-link"
                         title="Szerkesztés"
                       >
-                        <ChevronRight size={18} />
+                        <ChevronRight size={20} />
                       </Link>
                     </td>
                   </tr>
