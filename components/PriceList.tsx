@@ -19,33 +19,39 @@ export default function PriceList({
 }) {
   const { name, description, prices, image } = data;
   const [isMobile, setIsMobile] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [availableHeight, setAvailableHeight] = useState(500); // Default estimate
+  const stableRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [stableHeight, setStableHeight] = useState(() => 
+    typeof window !== 'undefined' ? window.innerHeight * 0.6 : 500
+  );
+  const [measuredHeaderHeight, setMeasuredHeaderHeight] = useState(0);
+
+  const isHeaderVisible = internalPage === 0;
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
-    // Measure available height for items
     const observer = new ResizeObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.target === containerRef.current) {
-          // Subtract some padding/safety margin
-          setAvailableHeight(entry.contentRect.height - 20);
+        if (entry.target === stableRef.current) {
+          setStableHeight(entry.contentRect.height);
+        }
+        if (entry.target === headerRef.current) {
+          setMeasuredHeaderHeight(entry.contentRect.height);
         }
       });
     });
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
+    if (stableRef.current) observer.observe(stableRef.current);
+    if (headerRef.current) observer.observe(headerRef.current);
 
     return () => {
       window.removeEventListener('resize', checkMobile);
       observer.disconnect();
     };
-  }, []);
+  }, [isHeaderVisible]); 
 
   // Filter prices
   const allFilteredPrices = useMemo(() => {
@@ -59,21 +65,30 @@ export default function PriceList({
 
   // Dynamic Page Calculation
   const pages = useMemo(() => {
-    // Estimating item heights
-    // Mobile: single col, desktop: 2 cols
-    // Header page (P0) is special
-    const itemHeight = isMobile ? 60 : 85; 
+    const itemHeight = isMobile ? 70 : 85; 
     const columns = isMobile ? 1 : 2;
     
-    // Rows available on P0 (Header is visible)
-    // availableHeight is already "net" height (after header), so NO subtraction needed.
-    const p0AvailableHeight = Math.max(120, availableHeight);
+    // stableHeight is the total height of the card content area.
+    // We need to account for the dots/padding area at the bottom.
+    const dotsAndPaddingHeight = isMobile ? 40 : 60;
+    const contentAreaHeight = Math.max(200, stableHeight - dotsAndPaddingHeight);
+    
+    // Pages calculation
+    // Page 0 has the large header.
+    // If we have a measured height, use it (with a small buffer for margin), otherwise use estimate.
+    const headerSpace = measuredHeaderHeight > 0 
+      ? measuredHeaderHeight + (isMobile ? 32 : 40) 
+      : (isMobile ? 220 : 300); // Increased desktop fallback to avoid "jumping" dots
+
+    const p0AvailableHeight = Math.max(120, contentAreaHeight - headerSpace);
     const p0Rows = Math.max(1, Math.floor(p0AvailableHeight / itemHeight));
     const p0Count = p0Rows * columns;
 
-    // Rows available on other pages
-    const otherRows = Math.max(1, Math.floor(availableHeight / itemHeight));
-    const restCount = otherRows * columns;
+    // Subsequent pages only have 1 row of header or none.
+    const restHeaderEstimate = isMobile ? 40 : 60;
+    const restAvailableHeight = Math.max(120, contentAreaHeight - restHeaderEstimate);
+    const restRows = Math.max(1, Math.floor(restAvailableHeight / itemHeight));
+    const restCount = restRows * columns;
 
     const p0 = allFilteredPrices.slice(0, p0Count);
     const rest = allFilteredPrices.slice(p0Count);
@@ -84,7 +99,7 @@ export default function PriceList({
     const result = [p0, ...chunks];
     if (result.length === 1 && result[0].length === 0) return []; // Empty case
     return result;
-  }, [allFilteredPrices, isMobile, availableHeight]);
+  }, [allFilteredPrices, isMobile, stableHeight, measuredHeaderHeight]);
 
   const currentPageItems = pages[internalPage] || [];
   const totalInternalPages = pages.length;
@@ -106,11 +121,12 @@ export default function PriceList({
 
         <div className="absolute top-0 original-right-0 w-64 h-64 bg-brand-brown/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         
-        <div className="relative z-10 flex flex-col h-full">
+        <div ref={stableRef} className="relative z-10 flex flex-col h-full">
           {/* Header - Only prominent on Page 0 */}
           <AnimatePresence mode="wait">
             {internalPage === 0 && (
               <motion.div 
+                ref={headerRef}
                 key="header"
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -149,7 +165,7 @@ export default function PriceList({
           )}
 
           {/* Items Container - This is what we measure */}
-          <div ref={containerRef} className="flex-1 relative min-h-0">
+          <div className="flex-1 relative min-h-0">
             <AnimatePresence mode="wait">
               <motion.div 
                 key={internalPage}
@@ -201,24 +217,25 @@ export default function PriceList({
             </AnimatePresence>
           </div>
 
-          {/* Internal Pagination Dots/Tabs */}
-          {totalInternalPages > 1 && (
-            <div className="mt-6 md:mt-12 mb-2 flex justify-center gap-3 shrink-0">
-              {pages.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => onInternalPageChange?.(idx)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                    internalPage === idx 
-                      ? "bg-brand-brown w-6 md:w-8" 
-                      : "bg-brand-brown/20 hover:bg-brand-brown/40"
-                  }`}
-                  aria-label={`Ugrás a(z) ${idx + 1}. belső oldalra`}
-                />
-              ))}
-            </div>
-          )}
         </div>
+
+        {/* Internal Pagination Dots/Tabs */}
+        {totalInternalPages > 1 && (
+          <div className="absolute left-1/2 -translate-x-1/2 -bottom-6 md:-bottom-10 flex justify-center gap-3 z-20">
+            {pages.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => onInternalPageChange?.(idx)}
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                  internalPage === idx 
+                    ? "bg-brand-brown w-6 md:w-8" 
+                    : "bg-brand-brown/20 hover:bg-brand-brown/40"
+                }`}
+                aria-label={`Ugrás a(z) ${idx + 1}. belső oldalra`}
+              />
+            ))}
+          </div>
+        )}
       </motion.div>
     </div>
   );
