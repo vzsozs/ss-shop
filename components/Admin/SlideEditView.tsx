@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Upload, Loader2, Save, Plus, Trash2, Link2, ChevronUp, ChevronDown } from 'lucide-react'
+import { Upload, Loader2, Save, Plus, Trash2, Link2, ChevronUp, ChevronDown, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import { Sidebar } from './Sidebar'
 import { Modal } from './Modal'
@@ -17,13 +17,21 @@ interface Slide {
   } | string | null
   category: string | { id: string, name: string }
   showOnHomepage: boolean
-  prices: { name: string, price: string, description?: string, product?: string | { id: string, name: string, slug: string } }[]
+  prices: { 
+    name: string, 
+    price: string, 
+    description?: string, 
+    product?: string | { id: string, name: string, slug: string, showInSlider?: boolean } 
+  }[]
 }
 
 interface ProductInfo {
   id: string
   name: string
   price: number
+  slug: string
+  showInSlider: boolean
+  ingredients?: { name: string }[]
   features?: { feature: string, value: string }[]
 }
 
@@ -97,9 +105,30 @@ export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
         return
       }
 
-      const res = await fetch(`/api/menu-slides/${id}`)
+      const res = await fetch(`/api/menu-slides/${id}?depth=2`)
       if (!res.ok) throw new Error('Nem sikerült betölteni az étlapot')
       const data = await res.json()
+      
+      // Live sync product data if linked
+      if (data.prices) {
+        data.prices = (data.prices as Slide['prices']).map(p => {
+          const productDoc = p.product as ProductInfo | null;
+          if (productDoc && typeof productDoc === 'object' && productDoc.id) {
+            const ingredients = Array.isArray(productDoc.ingredients) 
+              ? productDoc.ingredients.map(i => i.name).join(', ') 
+              : '';
+              
+            return {
+              ...p,
+              name: productDoc.name || p.name,
+              price: productDoc.price ? `${productDoc.price} Ft` : p.price,
+              description: ingredients || p.description
+            }
+          }
+          return p;
+        });
+      }
+      
       setSlide(data)
     } catch (err) {
       console.error('Hiba a betöltés során:', err)
@@ -215,12 +244,17 @@ export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
   }
 
   const addProductToPrices = (product: ProductInfo) => {
-    const description = product.features?.map(f => f.value).join(', ') || ''
+    const description = product.ingredients?.map(i => i.name).join(', ') || ''
     const newPrice = {
       name: product.name,
       price: `${product.price} Ft`,
       description,
-      product: product.id
+      product: {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        showInSlider: product.showInSlider
+      }
     }
     setSlide(prev => prev ? { ...prev, prices: [...prev.prices, newPrice] } : null)
     setShowProductSelector(false)
@@ -325,9 +359,40 @@ export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
               <div className="array-field-container">
                 {slide?.prices.map((p, index) => {
                   const isLinked = !!p.product
+                  const isInactive = isLinked && (p.product as { showInSlider?: boolean }).showInSlider === false
                   
                   return (
-                    <div key={index} className="array-item-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', padding: '1rem', background: isLinked ? 'rgba(119, 90, 43, 0.08)' : 'rgba(119, 90, 43, 0.03)', borderRadius: '12px', border: isLinked ? '1px solid rgba(119, 90, 43, 0.2)' : '1px solid rgba(119, 90, 43, 0.1)', position: 'relative' }}>
+                    <div key={index} className="array-item-row" style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '0.8rem', 
+                      padding: '1rem', 
+                      background: isLinked ? 'rgba(119, 90, 43, 0.08)' : 'rgba(119, 90, 43, 0.03)', 
+                      borderRadius: '12px', 
+                      border: isLinked ? '1px solid rgba(119, 90, 43, 0.2)' : '1px solid rgba(119, 90, 43, 0.1)', 
+                      position: 'relative',
+                      opacity: isInactive ? 0.3 : 1,
+                      transition: 'opacity 0.2s'
+                    }}>
+                      {isInactive && (
+                        <div style={{ 
+                          position: 'absolute', 
+                          top: '10px', 
+                          right: '50px', 
+                          background: '#d94e33', 
+                          color: 'white', 
+                          fontSize: '0.75rem', 
+                          padding: '4px 8px', 
+                          borderRadius: '6px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '6px', 
+                          fontWeight: 'bold',
+                          zIndex: 2
+                        }}>
+                          <EyeOff size={14} /> Jelenleg nem kapható
+                        </div>
+                      )}
                       <div style={{ display: 'flex', gap: '1rem' }}>
                         <input 
                           type="text" 

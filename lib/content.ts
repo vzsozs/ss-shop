@@ -125,15 +125,30 @@ export async function getSlidesData(): Promise<SlideData[]> {
         layoutType: 'price-list' as const,
         prices: Array.isArray(doc.prices) ? doc.prices.map((p: Record<string, unknown>) => {
           const productDoc = p.product as Record<string, unknown> | null;
+          
+          if (productDoc) {
+            const ingredients = Array.isArray(productDoc.ingredients) 
+              ? (productDoc.ingredients as { name: string }[]).map(i => i.name).join(', ') 
+              : '';
+              
+            return {
+              name: String(productDoc.name || p.name),
+              price: productDoc.price ? `${productDoc.price} Ft` : String(p.price),
+              description: ingredients || (p.description ? String(p.description) : undefined),
+              product: {
+                id: String(productDoc.id),
+                name: String(productDoc.name),
+                slug: String(productDoc.slug),
+                showInSlider: Boolean(productDoc.showInSlider)
+              }
+            };
+          }
+
           return {
             name: String(p.name),
             price: String(p.price),
             description: p.description ? String(p.description) : undefined,
-            product: productDoc ? {
-              id: String(productDoc.id),
-              name: String(productDoc.name),
-              slug: String(productDoc.slug),
-            } : undefined
+            product: undefined
           };
         }) : undefined,
         showOnHomepage: Boolean(doc.showOnHomepage)

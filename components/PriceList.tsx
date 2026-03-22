@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { SlideData } from "@/types/types";
 
 export default function PriceList({ data }: { data: SlideData }) {
-  const { name, description, prices } = data;
+  const { name, description, prices, image } = data;
 
   return (
     <div className="flex justify-center items-center w-full max-w-[1200px] mx-auto px-4 md:px-16 py-8 md:py-16 h-full box-border max-md:pt-24 relative">
@@ -21,6 +22,17 @@ export default function PriceList({ data }: { data: SlideData }) {
         
         <div className="relative z-10">
           <div className="mb-12 text-center md:text-left relative border border-brand-brown/20 p-4">
+            {image && (
+              <div className="absolute right-0 bottom-0 w-[450px] h-[500px] opacity-30 pointer-events-none -z-10 translate-x-[10%]">
+                <Image 
+                  src={image} 
+                  alt="" 
+                  fill 
+                  className="object-contain object-right-bottom" 
+                  priority
+                />
+              </div>
+            )}
             <span className="absolute top-0 right-0 bg-brand-brown text-white text-[8px] px-1">pub:7/8</span>
             <h2 className="text-[3.5rem] md:text-[5rem] font-extrabold leading-[1] text-brand-brown mb-4">
               {name}
@@ -31,7 +43,12 @@ export default function PriceList({ data }: { data: SlideData }) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8">
-            {prices?.map((item, index) => {
+            {prices?.filter(p => {
+              if (p.product && typeof p.product === 'object') {
+                return (p.product as { showInSlider?: boolean }).showInSlider !== false;
+              }
+              return true;
+            }).map((item, index) => {
               const product = typeof item.product === 'object' ? item.product : null;
               
               return (
