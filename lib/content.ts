@@ -123,11 +123,19 @@ export async function getSlidesData(): Promise<SlideData[]> {
         image: mapImageUrl(doc.backgroundImage),
         category: categoryName,
         layoutType: 'price-list' as const,
-        prices: Array.isArray(doc.prices) ? doc.prices.map((p: Record<string, unknown>) => ({
-          name: String(p.name),
-          price: String(p.price),
-          description: p.description ? String(p.description) : undefined
-        })) : undefined,
+        prices: Array.isArray(doc.prices) ? doc.prices.map((p: Record<string, unknown>) => {
+          const productDoc = p.product as Record<string, unknown> | null;
+          return {
+            name: String(p.name),
+            price: String(p.price),
+            description: p.description ? String(p.description) : undefined,
+            product: productDoc ? {
+              id: String(productDoc.id),
+              name: String(productDoc.name),
+              slug: String(productDoc.slug),
+            } : undefined
+          };
+        }) : undefined,
         showOnHomepage: Boolean(doc.showOnHomepage)
       };
     });
@@ -162,6 +170,9 @@ export async function getProducts(): Promise<Product[]> {
       features: Array.isArray(doc.features) ? (doc.features as Record<string, unknown>[]).map((f) => ({
         feature: String(f.feature),
         value: String(f.value || '')
+      })) : undefined,
+      ingredients: Array.isArray(doc.ingredients) ? (doc.ingredients as Record<string, unknown>[]).map((i) => ({
+        name: String(i.name)
       })) : undefined,
       image: mapImageUrl(doc.image),
     }));
@@ -200,6 +211,9 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       features: Array.isArray(doc.features) ? (doc.features as Record<string, unknown>[]).map((f) => ({
         feature: String(f.feature),
         value: String(f.value || '')
+      })) : undefined,
+      ingredients: Array.isArray(doc.ingredients) ? (doc.ingredients as Record<string, unknown>[]).map((i) => ({
+        name: String(i.name)
       })) : undefined,
       image: mapImageUrl(doc.image),
     };

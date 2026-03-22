@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { SlideData } from "@/types/types";
 
@@ -30,30 +31,44 @@ export default function PriceList({ data }: { data: SlideData }) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8">
-            {prices?.map((item, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="flex flex-col border-b border-brand-brown/10 pb-4 group hover:border-brand-brown/30 transition-colors relative"
-              >
-                <span className="absolute -top-2 left-0 text-[6px] opacity-40">pub:9/10/11</span>
-                <div className="flex justify-between items-baseline mb-1">
-                  <span className="text-[1.4rem] md:text-[1.8rem] font-bold text-brand-brown/90 group-hover:text-brand-brown transition-colors">
-                    {item.name}
-                  </span>
-                  <span className="text-[1.4rem] font-bold text-brand-brown font-mono">
-                    {item.price}
-                  </span>
-                </div>
-                {item.description && (
-                  <span className="text-[1rem] opacity-60 italic">
-                    {item.description}
-                  </span>
-                )}
-              </motion.div>
-            ))}
+            {prices?.map((item, index) => {
+              const product = typeof item.product === 'object' ? item.product : null;
+              
+              return (
+                <motion.div 
+                  key={index}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="flex flex-col border-b border-brand-brown/10 pb-4 group hover:border-brand-brown/30 transition-colors relative"
+                >
+                  <span className="absolute -top-2 left-0 text-[6px] opacity-40">pub:9/10/11</span>
+                  <div className="flex justify-between items-baseline mb-1">
+                    <span className="text-[1.4rem] md:text-[1.8rem] font-bold text-brand-brown/90 group-hover:text-brand-brown transition-colors">
+                      {item.name}
+                    </span>
+                    <span className="text-[1.4rem] font-bold text-brand-brown font-mono">
+                      {item.price}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-end">
+                    {item.description && (
+                      <span className="text-[1rem] opacity-60 italic">
+                        {item.description}
+                      </span>
+                    )}
+                    {product && product.slug && (
+                      <Link 
+                        href={`/termek/${product.slug}`}
+                        className="text-[0.8rem] font-bold text-brand-brown border border-brand-brown/30 px-3 py-1 rounded-full hover:bg-brand-brown hover:text-white transition-all ml-4 mb-1"
+                      >
+                        Részletek
+                      </Link>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </motion.div>

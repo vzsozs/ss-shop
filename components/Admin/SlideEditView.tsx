@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Upload, Loader2, Save, Plus, Trash2 } from 'lucide-react'
+import { Upload, Loader2, Save, Plus, Trash2, Link2, ChevronUp, ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import { Sidebar } from './Sidebar'
 import { Modal } from './Modal'
@@ -17,7 +17,14 @@ interface Slide {
   } | string | null
   category: string | { id: string, name: string }
   showOnHomepage: boolean
-  prices: { name: string, price: string, description?: string }[]
+  prices: { name: string, price: string, description?: string, product?: string | { id: string, name: string, slug: string } }[]
+}
+
+interface ProductInfo {
+  id: string
+  name: string
+  price: number
+  features?: { feature: string, value: string }[]
 }
 
 interface Category {
@@ -40,6 +47,8 @@ export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
 
   const [slide, setSlide] = useState<Slide | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
+  const [products, setProducts] = useState<ProductInfo[]>([])
+  const [showProductSelector, setShowProductSelector] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -65,6 +74,13 @@ export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
       if (catRes.ok) {
         const catData = await catRes.json()
         setCategories(catData.docs || [])
+      }
+
+      // Fetch products for selection
+      const prodRes = await fetch('/api/products?limit=100')
+      if (prodRes.ok) {
+        const prodData = await prodRes.json()
+        setProducts(prodData.docs || [])
       }
 
       if (isNew) {
@@ -198,7 +214,19 @@ export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
     setSlide(prev => prev ? { ...prev, prices: [...prev.prices, { name: '', price: '' }] } : null)
   }
 
-  const updatePrice = (index: number, field: string, value: string) => {
+  const addProductToPrices = (product: ProductInfo) => {
+    const description = product.features?.map(f => f.value).join(', ') || ''
+    const newPrice = {
+      name: product.name,
+      price: `${product.price} Ft`,
+      description,
+      product: product.id
+    }
+    setSlide(prev => prev ? { ...prev, prices: [...prev.prices, newPrice] } : null)
+    setShowProductSelector(false)
+  }
+
+  const updatePrice = (index: number, field: string, value: string | undefined) => {
     setSlide(prev => {
       if (!prev) return null
       const newPrices = [...prev.prices]
@@ -209,6 +237,21 @@ export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
 
   const removePrice = (index: number) => {
     setSlide(prev => prev ? { ...prev, prices: prev.prices.filter((_, i) => i !== index) } : null)
+  }
+
+  const movePrice = (index: number, direction: 'up' | 'down') => {
+    setSlide(prev => {
+      if (!prev) return null
+      const newPrices = [...prev.prices]
+      const targetIndex = direction === 'up' ? index - 1 : index + 1
+      if (targetIndex < 0 || targetIndex >= newPrices.length) return prev
+      
+      const temp = newPrices[index]
+      newPrices[index] = newPrices[targetIndex]
+      newPrices[targetIndex] = temp
+      
+      return { ...prev, prices: newPrices }
+    })
   }
 
   if (loading) return (
@@ -249,17 +292,17 @@ export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
                 className="field-input"
                 value={slide?.name || ''}
                 onChange={e => setSlide(prev => prev ? { ...prev, name: e.target.value } : null)}
-                placeholder="Pl. Ebéd ajánlatunk"
+                placeholder="Pl. Nyammiiii"
               />
             </div>
 
             <div className="form-group">
-              <label className="field-label">Alcím / Rövid leírás</label>
+              <label className="field-label">Rövid leírás</label>
               <textarea 
                 className="field-textarea"
                 value={slide?.description || ''}
                 onChange={e => setSlide(prev => prev ? { ...prev, description: e.target.value } : null)}
-                placeholder="Pl. Friss, napi ajánlatunk minden nap 11 és 15 óra között."
+                placeholder="Pl. Friss, gőzőlt csirkés szendó."
               />
             </div>
 
@@ -278,43 +321,117 @@ export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
             </div>
 
             <div className="form-group">
-              <label className="field-label">Tételek / Árak</label>
+              <label className="field-label">Tételek / Árak / Termékek</label>
               <div className="array-field-container">
-                {slide?.prices.map((p, index) => (
-                  <div key={index} className="array-item-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', padding: '1rem', background: 'rgba(119, 90, 43, 0.03)', borderRadius: '12px', border: '1px solid rgba(119, 90, 43, 0.1)' }}>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                      <input 
-                        type="text" 
-                        className="field-input"
-                        style={{ flex: 2 }}
-                        value={p.name}
-                        onChange={e => updatePrice(index, 'name', e.target.value)}
-                        placeholder="Tétel neve (pl. Marhapörkölt)"
-                      />
-                      <input 
-                        type="text" 
-                        className="field-input"
-                        style={{ flex: 1 }}
-                        value={p.price}
-                        onChange={e => updatePrice(index, 'price', e.target.value)}
-                        placeholder="Ár (pl. 2450 Ft)"
-                      />
-                      <button className="remove-item-btn" onClick={() => removePrice(index)}>
-                        <Trash2 size={18} />
-                      </button>
+                {slide?.prices.map((p, index) => {
+                  const isLinked = !!p.product
+                  
+                  return (
+                    <div key={index} className="array-item-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', padding: '1rem', background: isLinked ? 'rgba(119, 90, 43, 0.08)' : 'rgba(119, 90, 43, 0.03)', borderRadius: '12px', border: isLinked ? '1px solid rgba(119, 90, 43, 0.2)' : '1px solid rgba(119, 90, 43, 0.1)', position: 'relative' }}>
+                      <div style={{ display: 'flex', gap: '1rem' }}>
+                        <input 
+                          type="text" 
+                          className="field-input"
+                          style={{ flex: 2, opacity: isLinked ? 0.7 : 1, cursor: isLinked ? 'not-allowed' : 'text' }}
+                          value={p.name}
+                          onChange={e => updatePrice(index, 'name', e.target.value)}
+                          placeholder="Tétel neve (Pl. Sajtkrémes szendó)"
+                          readOnly={isLinked}
+                        />
+                        <input 
+                          type="text" 
+                          className="field-input"
+                          style={{ flex: 1, opacity: isLinked ? 0.7 : 1, cursor: isLinked ? 'not-allowed' : 'text' }}
+                          value={p.price}
+                          onChange={e => updatePrice(index, 'price', e.target.value)}
+                          placeholder="Ár (pl. 2450 Ft)"
+                          readOnly={isLinked}
+                        />
+                        
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          {isLinked && (
+                            <button 
+                              className="remove-item-btn" 
+                              onClick={() => updatePrice(index, 'product', undefined)}
+                              title="Leválasztás a termékről (szerkeszthetővé teszi)"
+                              style={{ color: '#775a2b' }}
+                            >
+                              <Link2 size={18} style={{ transform: 'rotate(45deg)' }} />
+                            </button>
+                          )}
+                          <button className="remove-item-btn" onClick={() => removePrice(index)}>
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'stretch', width: '100%' }}>
+                        <textarea 
+                          className="field-textarea"
+                          style={{ flex: 1, minHeight: '60px', width: '100%', fontSize: '0.9rem', opacity: isLinked ? 0.7 : 1, cursor: isLinked ? 'not-allowed' : 'text' }}
+                          value={p.description || ''}
+                          onChange={e => updatePrice(index, 'description', e.target.value)}
+                          placeholder="Részletek, összetevők..."
+                          readOnly={isLinked}
+                        />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', justifyContent: 'center' }}>
+                          <button 
+                            className="remove-item-btn" 
+                            onClick={() => movePrice(index, 'up')}
+                            disabled={index === 0}
+                            style={{ padding: '4px', opacity: index === 0 ? 0.3 : 1 }}
+                            title="Mozgatás fel"
+                          >
+                            <ChevronUp size={18} />
+                          </button>
+                          <button 
+                            className="remove-item-btn" 
+                            onClick={() => movePrice(index, 'down')}
+                            disabled={index === (slide?.prices.length || 0) - 1}
+                            style={{ padding: '4px', opacity: index === (slide?.prices.length || 0) - 1 ? 0.3 : 1 }}
+                            title="Mozgatás le"
+                          >
+                            <ChevronDown size={18} />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <textarea 
-                      className="field-textarea"
-                      style={{ minHeight: '60px', fontSize: '0.9rem' }}
-                      value={p.description || ''}
-                      onChange={e => updatePrice(index, 'description', e.target.value)}
-                      placeholder="Részletek, köret, összetevők..."
-                    />
+                  )
+                })}
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                  <button className="add-item-btn" onClick={addPrice} style={{ flex: 1 }}>
+                    <Plus size={18} /> Új tétel
+                  </button>
+                  <button 
+                    className="add-item-btn" 
+                    onClick={() => setShowProductSelector(true)} 
+                    style={{ flex: 1, background: 'rgba(119, 90, 43, 0.1)', border: '1px dashed rgba(119, 90, 43, 0.3)' }}
+                  >
+                    <Plus size={18} /> Új Termék
+                  </button>
+                </div>
+
+                {showProductSelector && (
+                  <div className="product-selector-overlay" style={{ marginTop: '1rem', padding: '1rem', background: 'white', borderRadius: '12px', border: '1px solid rgba(119, 90, 43, 0.2)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'center' }}>
+                      <h4 style={{ margin: 0, color: '#775a2b' }}>Válassz terméket</h4>
+                      <button onClick={() => setShowProductSelector(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#775a2b' }}>Bezárás</button>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.5rem', maxHeight: '200px', overflowY: 'auto' }}>
+                      {products.map(p => (
+                        <button 
+                          key={p.id} 
+                          onClick={() => addProductToPrices(p)}
+                          style={{ textAlign: 'left', padding: '0.8rem', borderRadius: '8px', border: '1px solid #eee', background: 'white', cursor: 'pointer' }}
+                          onMouseOver={e => (e.currentTarget.style.borderColor = '#775a2b')}
+                          onMouseOut={e => (e.currentTarget.style.borderColor = '#eee')}
+                        >
+                          <div style={{ color: '#775a2b', fontWeight: 'bold' }}>{p.name}</div>
+                          <div style={{ color: '#775a2b', fontSize: '0.8rem', opacity: 0.7 }}>{p.price} Ft</div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                ))}
-                <button className="add-item-btn" onClick={addPrice}>
-                  <Plus size={18} /> Új tétel hozzáadása
-                </button>
+                )}
               </div>
             </div>
           </div>

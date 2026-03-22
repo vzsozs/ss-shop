@@ -73,26 +73,22 @@ export const CustomProducts: React.FC = () => {
     setModalConfig(prev => ({ ...prev, isOpen: false }))
     setLoading(true)
     try {
-      console.log('Törlés indítása:', selectedIds)
-      
-      const results = await Promise.all(
-        selectedIds.map(async (id) => {
-          const res = await fetch(`/api/products/${id}`, { 
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
+      await Promise.all(
+        selectedIds.map(async id => {
+          const res = await fetch(`/api/products/${id}`, { method: 'DELETE' })
+          if (!res.ok) {
+            let errorMsg = `Hiba (${res.status})`
+            try {
+              const data = await res.json()
+              errorMsg = data.errors?.[0]?.message || data.message || errorMsg
+            } catch (e) {
+              console.error('Nem JSON hiba válasz:', e)
             }
-          })
-          return { id, ok: res.ok, status: res.status }
+            throw new Error(errorMsg)
+          }
+          return res
         })
       )
-      
-      console.log('Törlés eredményei:', results)
-      const failed = results.filter(r => !r.ok)
-      
-      if (failed.length > 0) {
-        throw new Error(`${failed.length} terméket nem sikerült törölni. (Status: ${failed[0].status})`)
-      }
 
       setProducts(prev => prev.filter(p => !selectedIds.includes(p.id)))
       setSelectedIds([])

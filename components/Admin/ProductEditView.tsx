@@ -15,6 +15,7 @@ interface Product {
   category: string | { id: string, name: string }
   unit: string
   features: { feature: string, value: string }[]
+  ingredients: { name: string }[]
   image: { id: string, url: string } | string | null
   showInSlider: boolean
   slug: string
@@ -78,6 +79,7 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
           category: '',
           unit: 'db',
           features: [],
+          ingredients: [],
           image: null,
           showInSlider: false,
           slug: ''
@@ -305,6 +307,23 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
     setProduct(prev => prev ? { ...prev, features: prev.features.filter((_, i) => i !== index) } : null)
   }
 
+  const addIngredient = () => {
+    setProduct(prev => prev ? { ...prev, ingredients: [...(prev.ingredients || []), { name: '' }] } : null)
+  }
+
+  const updateIngredient = (index: number, value: string) => {
+    setProduct(prev => {
+      if (!prev) return null
+      const newIngredients = [...(prev.ingredients || [])]
+      newIngredients[index] = { ...newIngredients[index], name: value }
+      return { ...prev, ingredients: newIngredients }
+    })
+  }
+
+  const removeIngredient = (index: number) => {
+    setProduct(prev => prev ? { ...prev, ingredients: prev.ingredients.filter((_, i) => i !== index) } : null)
+  }
+
   if (loading) return (
     <div className="custom-view-wrapper">
       <Sidebar />
@@ -442,7 +461,31 @@ export const ProductEditView: React.FC<{ params: { id: string } }> = (props) => 
                   </div>
                 ))}
                 <button className="add-item-btn" onClick={addFeature}>
-                  <Plus size={18} /> Új tulajdonság hozzáadása
+                  <Plus size={18} /> Új tulajdonság
+                </button>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="field-label">Összetevők</label>
+              <div className="array-field-container">
+                {product?.ingredients?.map((ing, index) => (
+                  <div key={index} className="array-item-row" style={{ display: 'flex', gap: '1rem', marginBottom: '0.8rem' }}>
+                    <input 
+                      type="text" 
+                      className="field-input array-input"
+                      value={ing.name}
+                      onChange={e => updateIngredient(index, e.target.value)}
+                      placeholder="Összetevő (pl. Sajt)"
+                      style={{ flex: 1 }}
+                    />
+                    <button className="remove-item-btn" onClick={() => removeIngredient(index)} style={{ flexShrink: 0 }}>
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                ))}
+                <button className="add-item-btn" onClick={addIngredient}>
+                  <Plus size={18} /> Új összetevő
                 </button>
               </div>
             </div>

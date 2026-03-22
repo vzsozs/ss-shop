@@ -19,6 +19,9 @@ export const Products: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: ({ req: { user } }) => !!user,
+    update: ({ req: { user } }) => !!user,
+    delete: ({ req: { user } }) => !!user,
   },
   fields: [
     {
@@ -119,6 +122,19 @@ export const Products: CollectionConfig = {
         {
           name: 'value',
           label: 'Érték',
+          type: 'text',
+          required: true,
+        },
+      ],
+    },
+    {
+      name: 'ingredients',
+      label: 'Összetevők',
+      type: 'array',
+      fields: [
+        {
+          name: 'name',
+          label: 'Összetevő neve',
           type: 'text',
           required: true,
         },

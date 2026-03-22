@@ -69,14 +69,23 @@ export const CustomCategories: React.FC = () => {
     setModalConfig(prev => ({ ...prev, isOpen: false }))
     setLoading(true)
     try {
-      const results = await Promise.all(
-        selectedIds.map(id => fetch(`/api/categories/${id}`, { method: 'DELETE' }))
+      await Promise.all(
+        selectedIds.map(async id => {
+          const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' })
+          if (!res.ok) {
+            let errorMsg = `Hiba (${res.status})`
+            try {
+              const data = await res.json()
+              errorMsg = data.errors?.[0]?.message || data.message || errorMsg
+            } catch (e) {
+              // Not JSON
+              console.error('Nem JSON hiba válasz:', e)
+            }
+            throw new Error(errorMsg)
+          }
+          return res
+        })
       )
-      
-      const allOk = results.every(res => res.ok)
-      if (!allOk) {
-        throw new Error('Néhány kategóriát nem sikerült törölni. Ellenőrizd a jogosultságokat!')
-      }
 
       setCategories(prev => prev.filter(c => !selectedIds.includes(c.id)))
       setSelectedIds([])

@@ -11,6 +11,12 @@ export const Slides: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'category'],
   },
+  access: {
+    read: () => true,
+    create: ({ req: { user } }) => !!user,
+    update: ({ req: { user } }) => !!user,
+    delete: ({ req: { user } }) => !!user,
+  },
   fields: [
     {
       name: 'name',
@@ -68,6 +74,12 @@ export const Slides: CollectionConfig = {
           name: 'description',
           label: 'Részletek (admin/etlapok 11)',
           type: 'textarea',
+        },
+        {
+          name: 'product',
+          label: 'Kapcsolódó Termék',
+          type: 'relationship',
+          relationTo: 'products',
         },
       ],
     },
