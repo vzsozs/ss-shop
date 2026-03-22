@@ -8,27 +8,85 @@ import { SlideData } from "@/types/types";
 
 export default function HomeClient({ slides }: { slides: SlideData[] }) {
   const [[page, direction], setPage] = useState([0, 0]);
+  const [internalPageIndex, setInternalPageIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const touchStartX = useRef<number | null>(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const activeIndex = page;
   const totalSlides = slides.length + 1;
+
+  // Calculate internal pages for the current slide
+  const getInternalPageCount = useCallback((slide: SlideData | undefined) => {
+    if (!slide || slide.layoutType !== 'price-list' || !slide.prices) return 1;
+    
+    const filteredPrices = slide.prices.filter(p => {
+      if (p.product && typeof p.product === 'object') {
+        return (p.product as { showInSlider?: boolean }).showInSlider !== false;
+      }
+      return true;
+    });
+
+    const p0Count = isMobile ? 2 : 4;
+    const restCount = isMobile ? 6 : 12;
+
+    if (filteredPrices.length <= p0Count) return 1;
+    const rest = filteredPrices.length - p0Count;
+    return 1 + Math.ceil(rest / restCount);
+  }, [isMobile]);
+
+  const currentSlide = slides[activeIndex];
+  const totalInternalPages = getInternalPageCount(currentSlide);
 
   const triggerCooldown = useCallback(() => {
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 800);
   }, []);
 
-  const paginate = useCallback((newDirection: number) => {
+  const paginate = useCallback((newDirection: number, forceSlideChange: boolean = false) => {
     if (isAnimating) return;
     setHasInteracted(true);
+
+    if (!forceSlideChange) {
+      // Check for internal pagination
+      if (newDirection === 1 && internalPageIndex < totalInternalPages - 1) {
+        setInternalPageIndex(prev => prev + 1);
+        triggerCooldown();
+        return;
+      }
+      if (newDirection === -1 && internalPageIndex > 0) {
+        setInternalPageIndex(prev => prev - 1);
+        triggerCooldown();
+        return;
+      }
+    }
+
+    // Main slide change
     const nextIndex = activeIndex + newDirection;
     if (nextIndex >= 0 && nextIndex < totalSlides) {
       setPage([nextIndex, newDirection]);
+      
+      // Determine new internal page index
+      if (newDirection === 1) {
+        setInternalPageIndex(0);
+      } else {
+        // When going back, we should ideally go to the LAST internal page of the previous slide
+        const prevSlide = slides[nextIndex];
+        const prevInternalCount = getInternalPageCount(prevSlide);
+        setInternalPageIndex(prevInternalCount - 1);
+      }
+      
       triggerCooldown();
     }
-  }, [activeIndex, isAnimating, totalSlides, triggerCooldown]);
+  }, [activeIndex, isAnimating, totalSlides, triggerCooldown, internalPageIndex, totalInternalPages, slides, getInternalPageCount]);
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
@@ -38,7 +96,7 @@ export default function HomeClient({ slides }: { slides: SlideData[] }) {
       else paginate(-1);
     };
 
-    window.addEventListener("wheel", handleWheel);
+    window.addEventListener("wheel", handleWheel, { passive: true });
     return () => window.removeEventListener("wheel", handleWheel);
   }, [paginate]);
 
@@ -116,7 +174,11 @@ export default function HomeClient({ slides }: { slides: SlideData[] }) {
               }}
               className="absolute inset-0 w-full h-full"
             >
-              <Slide data={slides[activeIndex]} />
+              <Slide 
+                data={slides[activeIndex]} 
+                internalPage={internalPageIndex}
+                onInternalPageChange={setInternalPageIndex}
+              />
             </motion.div>
           ) : (
             <motion.div
@@ -149,6 +211,25 @@ export default function HomeClient({ slides }: { slides: SlideData[] }) {
         <div className="line-brown w-[2px] top-[25px] bottom-[25px] left-0" />
         <div className="line-brown w-[2px] top-[25px] bottom-[25px] right-0" />
       </div>
+
+      {/* Quick Skip Button - Right Edge Center */}
+      <AnimatePresence>
+        {activeIndex < totalSlides - 1 && (
+          <motion.button
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 0.3, x: 0 }}
+            whileHover={{ opacity: 1, scale: 1.05 }}
+            onClick={() => paginate(1, true)}
+            className="fixed right-2 md:right-4 top-1/2 -translate-y-1/2 z-[100] text-brand-brown p-2 transition-all group pointer-events-auto"
+            title="Következő oldal"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 md:w-8 md:h-8 rotate-[-90deg] group-hover:translate-y-1 transition-transform drop-shadow-sm">
+              <path d="M19 6l-7 7-7-7" />
+            </svg>
+            <span className="sr-only">Következő</span>
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Progress Indicator */}
       <motion.div 

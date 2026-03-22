@@ -4,9 +4,15 @@ import { SlideData } from "@/types/types";
 import HeroCard from "./HeroCard";
 import PriceList from "./PriceList";
 
-const LAYOUT_MAP: Record<string, React.ComponentType<{ data: SlideData }>> = {
-  "hero-card": HeroCard,
-  "price-list": PriceList,
+type SlideComponentProps = { 
+  data: SlideData; 
+  internalPage?: number; 
+  onInternalPageChange?: (page: number) => void; 
+};
+
+const LAYOUT_MAP: Record<string, React.ComponentType<SlideComponentProps>> = {
+  "hero-card": HeroCard as React.ComponentType<SlideComponentProps>,
+  "price-list": PriceList as React.ComponentType<SlideComponentProps>,
 };
 
 function DefaultFallback({ data }: { data: SlideData }) {
@@ -20,9 +26,11 @@ function DefaultFallback({ data }: { data: SlideData }) {
 
 interface SlideProps {
   data: SlideData;
+  internalPage?: number;
+  onInternalPageChange?: (page: number) => void;
 }
 
-export default function Slide({ data }: SlideProps) {
+export default function Slide({ data, internalPage, onInternalPageChange }: SlideProps) {
   if (!data || !data.layoutType) {
     console.warn("Skipping slide due to missing layoutType:", data);
     return null;
@@ -32,7 +40,7 @@ export default function Slide({ data }: SlideProps) {
   
   return (
     <div className="w-full h-full relative overflow-hidden">
-      <Component data={data} />
+      <Component data={data} internalPage={internalPage} onInternalPageChange={onInternalPageChange} />
     </div>
   );
 }
