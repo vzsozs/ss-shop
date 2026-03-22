@@ -14,7 +14,7 @@ export default function PriceList({ data }: { data: SlideData }) {
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="w-full bg-white/5 backdrop-blur-sm border border-brand-brown/20 rounded-[40px] p-8 md:p-16 relative overflow-hidden"
+        className="w-full bg-white/5 backdrop-blur-sm border border-brand-brown/20 rounded-[40px] p-8 md:p-16 relative"
       >
         <span className="absolute top-0 left-0 bg-brand-brown/40 text-white text-[10px] px-2 py-1 rounded-br-xl z-50">pub:PRICELIST_CONTAINER</span>
 
@@ -23,12 +23,12 @@ export default function PriceList({ data }: { data: SlideData }) {
         <div className="relative z-10">
           <div className="mb-12 text-center md:text-left relative border border-brand-brown/20 p-4">
             {image && (
-              <div className="absolute right-0 bottom-0 w-[450px] h-[500px] opacity-30 pointer-events-none -z-10 translate-x-[10%]">
+              <div className="absolute left-1/2 -translate-x-1/2 md:left-auto md:right-0 md:translate-x-[10%] bottom-[40%] md:bottom-[10%] w-[280px] h-[350px] md:w-[450px] md:h-[500px] opacity-20 md:opacity-30 pointer-events-none -z-10">
                 <Image 
                   src={image} 
                   alt="" 
                   fill 
-                  className="object-contain object-right-bottom" 
+                  className="object-contain object-center-bottom md:object-right-bottom" 
                   priority
                 />
               </div>
