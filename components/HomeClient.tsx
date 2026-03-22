@@ -9,42 +9,13 @@ import { SlideData } from "@/types/types";
 export default function HomeClient({ slides }: { slides: SlideData[] }) {
   const [[page, direction], setPage] = useState([0, 0]);
   const [internalPageIndex, setInternalPageIndex] = useState(0);
+  const [totalInternalPages, setTotalInternalPages] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const touchStartX = useRef<number | null>(null);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   const activeIndex = page;
   const totalSlides = slides.length + 1;
-
-  // Calculate internal pages for the current slide
-  const getInternalPageCount = useCallback((slide: SlideData | undefined) => {
-    if (!slide || slide.layoutType !== 'price-list' || !slide.prices) return 1;
-    
-    const filteredPrices = slide.prices.filter(p => {
-      if (p.product && typeof p.product === 'object') {
-        return (p.product as { showInSlider?: boolean }).showInSlider !== false;
-      }
-      return true;
-    });
-
-    const p0Count = isMobile ? 2 : 4;
-    const restCount = isMobile ? 6 : 12;
-
-    if (filteredPrices.length <= p0Count) return 1;
-    const rest = filteredPrices.length - p0Count;
-    return 1 + Math.ceil(rest / restCount);
-  }, [isMobile]);
-
-  const currentSlide = slides[activeIndex];
-  const totalInternalPages = getInternalPageCount(currentSlide);
 
   const triggerCooldown = useCallback(() => {
     setIsAnimating(true);
@@ -78,15 +49,23 @@ export default function HomeClient({ slides }: { slides: SlideData[] }) {
       if (newDirection === 1) {
         setInternalPageIndex(0);
       } else {
-        // When going back, we should ideally go to the LAST internal page of the previous slide
-        const prevSlide = slides[nextIndex];
-        const prevInternalCount = getInternalPageCount(prevSlide);
-        setInternalPageIndex(prevInternalCount - 1);
+        // When going back, we don't know the total pages of the previous slide yet
+        // So we set it to a temporary high value, PriceList will correct it via callback
+        setInternalPageIndex(99); 
       }
       
       triggerCooldown();
     }
-  }, [activeIndex, isAnimating, totalSlides, triggerCooldown, internalPageIndex, totalInternalPages, slides, getInternalPageCount]);
+  }, [activeIndex, isAnimating, totalSlides, triggerCooldown, internalPageIndex, totalInternalPages]);
+
+  // Handle callback from PriceList when total pages are measured
+  const handleTotalPagesChange = useCallback((total: number) => {
+    setTotalInternalPages(total);
+    // If we were at "99" (going back), snap to the last page
+    if (internalPageIndex === 99) {
+      setInternalPageIndex(Math.max(0, total - 1));
+    }
+  }, [internalPageIndex]);
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
@@ -178,6 +157,7 @@ export default function HomeClient({ slides }: { slides: SlideData[] }) {
                 data={slides[activeIndex]} 
                 internalPage={internalPageIndex}
                 onInternalPageChange={setInternalPageIndex}
+                onTotalPagesChange={handleTotalPagesChange}
               />
             </motion.div>
           ) : (

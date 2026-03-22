@@ -8,6 +8,7 @@ type SlideComponentProps = {
   data: SlideData; 
   internalPage?: number; 
   onInternalPageChange?: (page: number) => void; 
+  onTotalPagesChange?: (total: number) => void;
 };
 
 const LAYOUT_MAP: Record<string, React.ComponentType<SlideComponentProps>> = {
@@ -28,9 +29,10 @@ interface SlideProps {
   data: SlideData;
   internalPage?: number;
   onInternalPageChange?: (page: number) => void;
+  onTotalPagesChange?: (total: number) => void;
 }
 
-export default function Slide({ data, internalPage, onInternalPageChange }: SlideProps) {
+export default function Slide({ data, internalPage, onInternalPageChange, onTotalPagesChange }: SlideProps) {
   if (!data || !data.layoutType) {
     console.warn("Skipping slide due to missing layoutType:", data);
     return null;
@@ -40,7 +42,12 @@ export default function Slide({ data, internalPage, onInternalPageChange }: Slid
   
   return (
     <div className="w-full h-full relative overflow-hidden">
-      <Component data={data} internalPage={internalPage} onInternalPageChange={onInternalPageChange} />
+      <Component 
+        data={data} 
+        internalPage={internalPage} 
+        onInternalPageChange={onInternalPageChange}
+        onTotalPagesChange={onTotalPagesChange} 
+      />
     </div>
   );
 }
