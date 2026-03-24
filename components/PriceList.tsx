@@ -63,33 +63,37 @@ export default function PriceList({
     });
   }, [prices]);
 
-  // Dynamic Page Calculation
+  // Dinamikus oldalszámítás (Pagination)
   const pages = useMemo(() => {
+    // Becsült elem magasságok: mobilon 70px, asztali gépen 85px
     const itemHeight = isMobile ? 70 : 85; 
     const columns = isMobile ? 1 : 2;
     
-    // stableHeight is the total height of the card content area.
-    // We need to account for the dots/padding area at the bottom.
+    // stableHeight: a teljes kártya mérhető magassága ( ResizeObserver méri)
+    // Levonjuk a pöttyök és a belső margók becsült magasságát az alján
     const dotsAndPaddingHeight = isMobile ? 40 : 60;
     const contentAreaHeight = Math.max(200, stableHeight - dotsAndPaddingHeight);
     
-    // Pages calculation
-    // Page 0 has the large header.
-    // If we have a measured height, use it (with a small buffer for margin), otherwise use estimate.
+    // Oldalankénti számítás
+    // A 0. oldal speciális, mert ott látható a nagy fejléc (Cím + Leírás)
+    // Ha már lemértük a fejlécet (measuredHeaderHeight), azt használjuk, egyébként tippelünk egy alapértelmezettet
     const headerSpace = measuredHeaderHeight > 0 
       ? measuredHeaderHeight + (isMobile ? 32 : 40) 
-      : (isMobile ? 220 : 300); // Increased desktop fallback to avoid "jumping" dots
+      : (isMobile ? 220 : 300); // Fix fallback, hogy ne ugráljon az oldalszám az első mérésig
 
+    // Kiszámoljuk mennyi hely marad a termékeknek a 0. oldalon
     const p0AvailableHeight = Math.max(120, contentAreaHeight - headerSpace);
     const p0Rows = Math.max(1, Math.floor(p0AvailableHeight / itemHeight));
     const p0Count = p0Rows * columns;
 
-    // Subsequent pages only have 1 row of header or none.
+    // A többi oldalon (P1, P2...) nincs nagy fejléc, így több termék fér el
     const restHeaderEstimate = isMobile ? 40 : 60;
-    const restAvailableHeight = Math.max(120, contentAreaHeight - restHeaderEstimate);
+    // Levonunk extra biztonsági tartalékot desktopon (hogy ne legyen túl szoros az alja)
+    const restAvailableHeight = Math.max(120, contentAreaHeight - restHeaderEstimate - (isMobile ? 0 : 50));
     const restRows = Math.max(1, Math.floor(restAvailableHeight / itemHeight));
     const restCount = restRows * columns;
 
+    // Felosztjuk a terméklistát az oldalak (p0 és a maradék chunks) között
     const p0 = allFilteredPrices.slice(0, p0Count);
     const rest = allFilteredPrices.slice(p0Count);
     const chunks = [];
@@ -97,14 +101,16 @@ export default function PriceList({
       chunks.push(rest.slice(i, i + restCount));
     }
     const result = [p0, ...chunks];
-    if (result.length === 1 && result[0].length === 0) return []; // Empty case
+    if (result.length === 1 && result[0].length === 0) return []; // Üres lista kezelése
     return result;
   }, [allFilteredPrices, isMobile, stableHeight, measuredHeaderHeight]);
 
+  // Aktuális belső oldalon megjelenítendő elemek
   const currentPageItems = pages[internalPage] || [];
+  // Összesített oldalszám (ez határozza meg a pöttyök számát)
   const totalInternalPages = pages.length;
 
-  // Notify parent of total pages
+  // Értesítjük a szülő komponenst (HomeClient), ha megváltozott az oldalszám
   useEffect(() => {
     onTotalPagesChange?.(totalInternalPages);
   }, [totalInternalPages, onTotalPagesChange]);
@@ -117,7 +123,6 @@ export default function PriceList({
         transition={{ duration: 0.8 }}
         className="w-full bg-white/5 backdrop-blur-sm border border-brand-brown/20 rounded-[40px] p-8 md:p-12 pb-2 md:pb-0 relative flex flex-col h-full max-h-[65vh]"
       >
-        <span className="absolute top-0 left-0 bg-brand-brown/40 text-white text-[10px] px-2 py-1 rounded-br-xl z-50">pub:PRICELIST_CONTAINER</span>
 
         <div className="absolute top-0 original-right-0 w-64 h-64 bg-brand-brown/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         
@@ -131,10 +136,10 @@ export default function PriceList({
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mb-6 md:mb-10 text-center md:text-left relative border border-brand-brown/20 p-4 shrink-0"
+                className="mb-6 md:mb-10 text-center md:text-left relative"
               >
                 {image && (
-                  <div className="absolute left-1/2 -translate-x-1/2 md:left-auto md:right-0 md:translate-x-[10%] bottom-[40%] md:bottom-[10%] w-[200px] h-[250px] md:w-[450px] md:h-[500px] opacity-20 md:opacity-30 pointer-events-none -z-10">
+                  <div className="absolute left-1/2 -translate-x-1/2 md:left-auto md:right-0 md:translate-x-[10%] bottom-[40%] md:bottom-[0%] w-[200px] h-[250px] md:w-[450px] md:h-[500px] opacity-20 md:opacity-30 pointer-events-none -z-10">
                     <Image 
                       src={image} 
                       alt="" 
@@ -144,8 +149,7 @@ export default function PriceList({
                     />
                   </div>
                 )}
-                <span className="absolute top-0 right-0 bg-brand-brown text-white text-[8px] px-1">pub:7/8</span>
-                <h2 className="text-[2.5rem] md:text-[4rem] font-extrabold leading-[1] text-brand-brown mb-2 md:mb-4">
+                <h2 className="text-[2.5rem] md:text-[4rem] font-extrabold leading-[1] text-black mb-2 md:mb-4">
                   {name}
                 </h2>
                 <p className="text-[1rem] md:text-[1.2rem] opacity-70 max-w-[600px] leading-tight mt-0.0 md:mt-1">
@@ -158,7 +162,7 @@ export default function PriceList({
           {/* Small Header for other pages */}
           {internalPage > 0 && (
             <div className="mb-4 md:mb-8 flex justify-between items-center border-b border-brand-brown/20 pb-2 md:pb-4 shrink-0">
-               <h3 className="text-[1.2rem] md:text-[1.8rem] font-bold text-brand-brown opacity-80 uppercase tracking-widest">
+               <h3 className="text-[1.2rem] md:text-[1.8rem] font-bold text-black opacity-80 uppercase tracking-sm">
                 {name} <span className="opacity-40 ml-2">({internalPage + 1}/{totalInternalPages})</span>
               </h3>
             </div>
@@ -186,7 +190,6 @@ export default function PriceList({
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                       className="flex flex-col border-b border-brand-brown/10 pb-2 group hover:border-brand-brown/30 transition-colors relative"
                     >
-                      <span className="absolute -top-2 left-0 text-[6px] opacity-40">pub:9/10/11</span>
                       <div className="flex justify-between items-baseline mb-0.5">
                         <span className="text-[1.1rem] md:text-[1.8rem] font-bold text-brand-brown/90 group-hover:text-brand-brown transition-colors truncate pr-2">
                           {item.name}
