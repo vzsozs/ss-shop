@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Upload, Loader2, Save } from 'lucide-react'
+import { ArrowLeft, Upload, Loader2, Save, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Sidebar } from './Sidebar'
@@ -17,6 +17,7 @@ interface Category {
     url: string
   } | string | null
   ctaType: string
+  subcategories?: { name: string }[]
 }
 
 export const CategoryEditView: React.FC<{ params: { id: string } }> = (props) => {
@@ -61,7 +62,8 @@ export const CategoryEditView: React.FC<{ params: { id: string } }> = (props) =>
         name: '',
         description: '',
         image: null,
-        ctaType: 'none'
+        ctaType: 'none',
+        subcategories: []
       })
       setLoading(false)
       return
@@ -115,11 +117,15 @@ export const CategoryEditView: React.FC<{ params: { id: string } }> = (props) =>
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submitData),
+        credentials: 'same-origin',
       })
 
       if (!res.ok) {
+        if (res.status === 403) {
+          throw new Error('Nincs jogosultságod a mentéshez. Valószínűleg lejárt a munkameneted, kérlek jelentkezz be újra!')
+        }
         const err = await res.json()
-        throw new Error(err.errors?.[0]?.message || 'Sikertelen mentés')
+        throw new Error(err.errors?.[0]?.message || 'Sikertelen mentés. Kérlek ellenőrizd az adatokat!')
       }
 
       setModalConfig({
@@ -173,6 +179,36 @@ export const CategoryEditView: React.FC<{ params: { id: string } }> = (props) =>
     } finally {
       setUploading(false)
     }
+  }
+
+  const addSubcategory = () => {
+    setCategory(prev => prev ? { ...prev, subcategories: [...(prev.subcategories || []), { name: '' }] } : null)
+  }
+
+  const updateSubcategory = (index: number, name: string) => {
+    setCategory(prev => {
+      if (!prev) return null
+      const newSubs = [...(prev.subcategories || [])]
+      newSubs[index] = { ...newSubs[index], name }
+      return { ...prev, subcategories: newSubs }
+    })
+  }
+
+  const removeSubcategory = (index: number) => {
+    setCategory(prev => prev ? { ...prev, subcategories: (prev.subcategories || []).filter((_, i) => i !== index) } : null)
+  }
+
+  const moveSubcategory = (index: number, direction: 'up' | 'down') => {
+    setCategory(prev => {
+      if (!prev || !prev.subcategories) return null
+      const newSubs = [...prev.subcategories]
+      const targetIndex = direction === 'up' ? index - 1 : index + 1
+      if (targetIndex < 0 || targetIndex >= newSubs.length) return prev
+      const temp = newSubs[index]
+      newSubs[index] = newSubs[targetIndex]
+      newSubs[targetIndex] = temp
+      return { ...prev, subcategories: newSubs }
+    })
   }
 
   if (loading) return (
@@ -230,6 +266,48 @@ export const CategoryEditView: React.FC<{ params: { id: string } }> = (props) =>
                 <option value="drink">Itallap</option>
                 <option value="contact">Kapcsolat</option>
               </select>
+            </div>
+
+            <div className="form-group">
+              <label className="field-label">Alkategóriák (pl. Forró, Hideg, 18+)</label>
+              <div className="array-field-container">
+                {(category?.subcategories || []).map((sub, index) => (
+                  <div key={index} className="array-item-row" style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem', alignItems: 'center' }}>
+                    <input 
+                      type="text" 
+                      className="field-input"
+                      style={{ flex: 1 }}
+                      value={sub.name}
+                      onChange={e => updateSubcategory(index, e.target.value)}
+                      placeholder="Alkategória neve"
+                    />
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button 
+                        className="remove-item-btn" 
+                        onClick={() => moveSubcategory(index, 'up')}
+                        disabled={index === 0}
+                        style={{ padding: '4px', opacity: index === 0 ? 0.3 : 1 }}
+                      >
+                        <ChevronUp size={18} />
+                      </button>
+                      <button 
+                        className="remove-item-btn" 
+                        onClick={() => moveSubcategory(index, 'down')}
+                        disabled={index === (category?.subcategories?.length || 0) - 1}
+                        style={{ padding: '4px', opacity: index === (category?.subcategories?.length || 0) - 1 ? 0.3 : 1 }}
+                      >
+                        <ChevronDown size={18} />
+                      </button>
+                      <button className="remove-item-btn" onClick={() => removeSubcategory(index)}>
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <button className="add-item-btn" onClick={addSubcategory} style={{ marginTop: '0.5rem', width: '100%' }}>
+                  <Plus size={18} /> Új Alkategória
+                </button>
+              </div>
             </div>
           </div>
 

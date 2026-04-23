@@ -25,6 +25,25 @@ export default function PriceList({
     typeof window !== 'undefined' ? window.innerHeight * 0.6 : 500
   );
   const [measuredHeaderHeight, setMeasuredHeaderHeight] = useState(0);
+  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
+
+  // Extract unique subcategories
+  const subcategories = useMemo(() => {
+    const subs = new Set<string>();
+    (prices || []).forEach(p => {
+      if (p.subcategory) {
+        p.subcategory.split(',').forEach(s => {
+          if (s) subs.add(s);
+        });
+      }
+    });
+    return Array.from(subs);
+  }, [prices]);
+
+  // Reset internal page when subcategory changes
+  useEffect(() => {
+    onInternalPageChange?.(0);
+  }, [activeSubcategory, onInternalPageChange]);
 
   const isHeaderVisible = internalPage === 0;
 
@@ -56,12 +75,19 @@ export default function PriceList({
   // Filter prices
   const allFilteredPrices = useMemo(() => {
     return (prices || []).filter(p => {
+      // First filter by showInSlider
       if (p.product && typeof p.product === 'object') {
-        return (p.product as { showInSlider?: boolean }).showInSlider !== false;
+        if ((p.product as { showInSlider?: boolean }).showInSlider === false) return false;
       }
+      
+      // Then filter by subcategory if active
+      if (activeSubcategory) {
+        return (p.subcategory || '').split(',').includes(activeSubcategory);
+      }
+      
       return true;
     });
-  }, [prices]);
+  }, [prices, activeSubcategory]);
 
   // Dinamikus oldalszámítás (Pagination)
   const pages = useMemo(() => {
@@ -121,7 +147,7 @@ export default function PriceList({
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="w-full bg-white/5 backdrop-blur-sm border border-brand-brown/20 rounded-[40px] p-8 md:p-12 pb-2 md:pb-0 relative flex flex-col h-full max-h-[65vh]"
+        className="w-full p-8 md:p-12 pb-2 md:pb-0 relative flex flex-col h-full max-h-[65vh]"
       >
 
         <div className="absolute top-0 original-right-0 w-64 h-64 bg-brand-brown/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -159,6 +185,35 @@ export default function PriceList({
             )}
           </AnimatePresence>
 
+          {/* Subcategory Tabs */}
+          {subcategories.length > 0 && (
+            <div className="mb-6 md:mb-8 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+              <button
+                onClick={() => setActiveSubcategory(null)}
+                className={`px-4 py-1.5 md:px-6 md:py-2 rounded-full text-[0.85rem] md:text-[1rem] font-bold transition-all whitespace-nowrap ${
+                  activeSubcategory === null 
+                    ? "bg-brand-brown text-white shadow-lg" 
+                    : "bg-brand-brown/10 text-brand-brown hover:bg-brand-brown/20"
+                }`}
+              >
+                Összes
+              </button>
+              {subcategories.map((sub) => (
+                <button
+                  key={sub}
+                  onClick={() => setActiveSubcategory(sub)}
+                  className={`px-4 py-1.5 md:px-6 md:py-2 rounded-full text-[0.85rem] md:text-[1rem] font-bold transition-all whitespace-nowrap ${
+                    activeSubcategory === sub 
+                      ? "bg-brand-brown text-white shadow-lg" 
+                      : "bg-brand-brown/10 text-brand-brown hover:bg-brand-brown/20"
+                  }`}
+                >
+                  {sub}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Small Header for other pages */}
           {internalPage > 0 && (
             <div className="mb-4 md:mb-8 flex justify-between items-center border-b border-brand-brown/20 pb-2 md:pb-4 shrink-0">
@@ -172,7 +227,7 @@ export default function PriceList({
           <div className="flex-1 relative min-h-0">
             <AnimatePresence mode="wait">
               <motion.div 
-                key={internalPage}
+                key={`${activeSubcategory}-${internalPage}`}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}

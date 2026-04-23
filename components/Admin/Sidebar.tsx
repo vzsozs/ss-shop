@@ -16,13 +16,41 @@ import {
   Menu,
   X
 } from 'lucide-react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Logo } from '../Brand/Logo'
 
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname()
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
+
+  React.useEffect(() => {
+    // Don't check auth or redirect if we are on the login page
+    if (pathname === '/admin/login') return
+
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/users/me', {
+          credentials: 'include'
+        })
+        const data = await res.json()
+        if (!data.user) {
+          window.location.href = '/admin/login'
+        } else {
+          setUser(data.user)
+        }
+      } catch (err) {
+        console.error('Auth check error:', err)
+        // Only redirect if not already on login page
+        if (window.location.pathname !== '/admin/login') {
+          window.location.href = '/admin/login'
+        }
+      }
+    }
+    checkAuth()
+  }, [pathname])
 
   const toggleSidebar = () => setIsOpen(!isOpen)
   const closeSidebar = () => setIsOpen(false)
@@ -94,10 +122,10 @@ export const Sidebar: React.FC = () => {
 
         <div className="nav-footer">
           <div className="user-profile">
-              <div className="user-avatar">AD</div>
+              <div className="user-avatar">{user?.email?.[0]?.toUpperCase() || 'A'}</div>
               <div className="user-info">
-                  <span className="user-name">Adminisztrátor</span>
-                  <span className="user-role">Szuperfelhasználó</span>
+                  <span className="user-name">{user?.email || 'Betöltés...'}</span>
+                  <span className="user-role">Bejelentkezve</span>
               </div>
           </div>
           <p className="nav-version">v0.1 | design by zsozs & antigravity</p>

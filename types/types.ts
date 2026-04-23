@@ -4,6 +4,7 @@ export interface PriceItem {
   name: string;
   price: string;
   description?: string;
+  subcategory?: string;
   product?: string | { id: string; name: string; slug: string; showInSlider?: boolean } | Product;
 }
 

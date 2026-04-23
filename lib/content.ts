@@ -135,6 +135,7 @@ export async function getSlidesData(): Promise<SlideData[]> {
               name: String(productDoc.name || p.name),
               price: productDoc.price ? `${productDoc.price} Ft` : String(p.price),
               description: ingredients || (p.description ? String(p.description) : undefined),
+              subcategory: p.subcategory ? String(p.subcategory) : undefined,
               product: {
                 id: String(productDoc.id),
                 name: String(productDoc.name),
@@ -148,6 +149,7 @@ export async function getSlidesData(): Promise<SlideData[]> {
             name: String(p.name),
             price: String(p.price),
             description: p.description ? String(p.description) : undefined,
+            subcategory: p.subcategory ? String(p.subcategory) : undefined,
             product: undefined
           };
         }) : undefined,

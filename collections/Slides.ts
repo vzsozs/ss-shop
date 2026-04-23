@@ -76,6 +76,11 @@ export const Slides: CollectionConfig = {
           type: 'textarea',
         },
         {
+          name: 'subcategory',
+          label: 'Alkategória (pl. Forró, Hideg, 18+)',
+          type: 'text',
+        },
+        {
           name: 'product',
           label: 'Kapcsolódó Termék',
           type: 'relationship',

@@ -67,6 +67,12 @@ export default buildConfig({
     {
       slug: 'users',
       auth: true,
+      access: {
+        read: ({ req: { user } }) => !!user,
+        create: ({ req: { user } }) => !!user,
+        update: ({ req: { user } }) => !!user,
+        delete: ({ req: { user } }) => !!user,
+      },
       fields: [],
     },
   ],
@@ -84,5 +90,15 @@ export default buildConfig({
   i18n: {
     supportedLanguages: { hu },
   },
+  csrf: [
+    'http://localhost:3000',
+    'http://192.168.0.100:3000',
+    'http://127.0.0.1:3000',
+  ],
+  cors: [
+    'http://localhost:3000',
+    'http://192.168.0.100:3000',
+    'http://127.0.0.1:3000',
+  ],
 })
 // Last update: 03/21/2026 05:58:04

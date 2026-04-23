@@ -21,6 +21,7 @@ interface Slide {
     name: string, 
     price: string, 
     description?: string, 
+    subcategory?: string,
     product?: string | { id: string, name: string, slug: string, showInSlider?: boolean } 
   }[]
 }
@@ -38,6 +39,7 @@ interface ProductInfo {
 interface Category {
   id: string
   name: string
+  subcategories?: { name: string }[]
 }
 
 export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
@@ -181,11 +183,15 @@ export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submitData),
+        credentials: 'same-origin',
       })
 
       if (!res.ok) {
+        if (res.status === 403) {
+          throw new Error('Nincs jogosultságod a mentéshez. Valószínűleg lejárt a munkameneted, kérlek jelentkezz be újra!')
+        }
         const err = await res.json()
-        throw new Error(err.errors?.[0]?.message || 'Sikertelen mentés')
+        throw new Error(err.errors?.[0]?.message || 'Sikertelen mentés. Kérlek ellenőrizd az adatokat!')
       }
 
       setModalConfig({
@@ -354,6 +360,17 @@ export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
               </select>
             </div>
 
+            {slide?.category && (
+              <div className="form-group">
+                <label className="field-label">Elérhető Alkategóriák ebben a kategóriában:</label>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+                  {categories.find(c => c.id === (typeof slide.category === 'object' ? slide.category.id : slide.category))?.subcategories?.map(sub => (
+                    <span key={sub.name} className="badge-branded" style={{ fontSize: '0.8rem' }}>{sub.name}</span>
+                  )) || <span style={{ opacity: 0.5, fontSize: '0.9rem' }}>Nincsenek alkategóriák megadva ehhez a kategóriához.</span>}
+                </div>
+              </div>
+            )}
+
             <div className="form-group">
               <label className="field-label">Tételek / Árak / Termékek</label>
               <div className="array-field-container">
@@ -412,6 +429,25 @@ export const SlideEditView: React.FC<{ params: { id: string } }> = (props) => {
                           placeholder="Ár (pl. 2450 Ft)"
                           readOnly={isLinked}
                         />
+                        
+                        <div style={{ flex: 2, display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+                          {categories.find(c => c.id === (typeof slide?.category === 'object' ? slide.category.id : slide?.category))?.subcategories?.map(sub => (
+                            <label key={sub.name} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', cursor: 'pointer', background: 'rgba(119, 90, 43, 0.05)', padding: '4px 8px', borderRadius: '6px' }}>
+                              <input 
+                                type="checkbox" 
+                                checked={(p.subcategory || '').split(',').includes(sub.name)}
+                                onChange={e => {
+                                  const current = (p.subcategory || '').split(',').filter(s => s !== '')
+                                  const next = e.target.checked 
+                                    ? [...current, sub.name] 
+                                    : current.filter(s => s !== sub.name)
+                                  updatePrice(index, 'subcategory', next.join(','))
+                                }}
+                              />
+                              {sub.name}
+                            </label>
+                          ))}
+                        </div>
                         
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                           {isLinked && (

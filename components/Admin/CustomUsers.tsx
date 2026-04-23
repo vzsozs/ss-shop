@@ -15,6 +15,7 @@ interface User {
 export const CustomUsers: React.FC = () => {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [modalConfig, setModalConfig] = useState<{
     isOpen: boolean
@@ -31,11 +32,20 @@ export const CustomUsers: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/users?limit=100')
+      setError(null)
+      const response = await fetch('/api/users?limit=100', {
+        credentials: 'same-origin'
+      })
       const data = await response.json()
-      setUsers(data.docs)
-    } catch (error) {
-      console.error('Error fetching users:', error)
+      
+      if (!response.ok) {
+        throw new Error(data.errors?.[0]?.message || 'Nincs jogosultságod a felhasználók megtekintéséhez.')
+      }
+      
+      setUsers(data.docs || [])
+    } catch (err: any) {
+      console.error('Error fetching users:', err)
+      setError(err.message)
     } finally {
       setLoading(false)
     }
@@ -156,16 +166,29 @@ export const CustomUsers: React.FC = () => {
             <div style={{ padding: '5rem', textAlign: 'center', color: '#775a2b', fontSize: '1.5rem', fontWeight: 800 }}>
               Felhasználók betöltése...
             </div>
+          ) : error ? (
+            <div style={{ 
+              padding: '5rem', 
+              textAlign: 'center', 
+              color: '#d32f2f', 
+              fontSize: '1.2rem', 
+              fontWeight: 600,
+              backgroundColor: '#ffebee',
+              borderRadius: '8px',
+              margin: '2rem'
+            }}>
+              {error}
+            </div>
           ) : (
             <table className="custom-table">
               <thead>
                 <tr>
                   <th style={{ width: '50px' }}>
                     <div 
-                      className={`checkbox-container ${selectedIds.length === users.length ? 'checked' : ''}`}
+                      className={`checkbox-container ${users && selectedIds.length === users.length ? 'checked' : ''}`}
                       onClick={toggleSelectAll}
                     >
-                      {selectedIds.length === users.length && <Check size={14} color="white" />}
+                      {users && selectedIds.length === users.length && <Check size={14} color="white" />}
                     </div>
                   </th>
                   <th>Email cím</th>

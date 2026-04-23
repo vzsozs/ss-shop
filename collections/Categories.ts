@@ -50,6 +50,19 @@ export const Categories: CollectionConfig = {
       ],
       required: true,
     },
+    {
+      name: 'subcategories',
+      label: 'Alkategóriák (admin/kategoriak 4)',
+      type: 'array',
+      fields: [
+        {
+          name: 'name',
+          label: 'Alkategória neve',
+          type: 'text',
+          required: true,
+        },
+      ],
+    },
   ],
   hooks: {
     beforeDelete: [

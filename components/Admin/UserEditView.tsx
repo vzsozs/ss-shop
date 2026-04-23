@@ -97,6 +97,7 @@ export const UserEditView: React.FC<{ params: { id: string } }> = (props) => {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submitData),
+        credentials: 'same-origin',
       })
 
       if (!res.ok) {
